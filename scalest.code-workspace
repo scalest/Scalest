@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "Scala"
+		},
+		{
+			"path": "admin-ui"
+		},
+		{
+			"path": ".",
+		},
+	],
+	"settings": {
+		"files.exclude": {
+			"**/Scala": true,
+			"**/admin-ui": true,
+			"**/.idea": true,
+			"**/.metals": true,
+			"**/.bloop": true,
+			"**/dist": true,
+			"**/node_modules": true,
+			"**/target": true,
+		},
+		"emmet.includeLanguages": {
+			"javascript": "javascriptreact"
+		},
+		"eslint.format.enable": true
+	}
+}

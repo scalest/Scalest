@@ -1,0 +1,39 @@
+# Created by .ignore support plugin (hsz.mobi)
+### Scala template
+*.class
+*.log
+.bloop
+.idea
+.metals
+
+cmake-build-debug/
+cmake-build-release/
+
+# File-based project format
+*.iws
+
+out/
+
+.idea_modules/
+
+atlassian-ide-plugin.xml
+
+.idea/replstate.xml
+
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+.idea/httpRequests
+
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+.history
+.cache
+.lib/
+
