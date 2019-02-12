@@ -1,8 +1,8 @@
 package scalest
 
-import akka.http.scaladsl.server.Directives
+import akka.http.scaladsl.server.{Directives, Route}
 
 trait ScalestService
   extends Directives {
-  //Some handy stuff in future
+  def route: Route
 }

@@ -5,7 +5,7 @@ import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import distage._
 import scalest.ScalestApp
 import scalest.admin.ModelViewInstances._
-import scalest.admin.{ModelAdmin, ModelView}
+import scalest.admin.{AdminExtension, ModelAdmin}
 import slick.basic.DatabaseConfig
 import slick.jdbc.H2Profile
 
@@ -19,23 +19,26 @@ object PetModule
 }
 
 object PetApp
-  extends ScalestApp("PetApp") {
+  extends ScalestApp("PetApp", List(PetModule)) with App {
 
-  private val module = PetModule ++ akkaModule
-  private val plan = injector.plan(module)
-  val classes: Locator = injector.produceUnsafe(plan)
+  locator.get[Migration].migrate()
 
-  classes.get[Migration].migrate()
+  val petRepository: PetRepository = locator.get[PetRepository]
 
-  val petRepository: PetRepository = classes.get[PetRepository]
-
-  val petAdminExt = new ModelAdmin(
-    "pet",
-    List[(String, ModelView)]("id" -> intIdMV, "name" -> strMV, "adopted" -> boolMV),
-    petRepository
+  private val adminExtension = new AdminExtension(
+    List(
+      new ModelAdmin(
+        "pet",
+        List("id" -> intIdMV, "name" -> strMV, "adopted" -> boolMV),
+        petRepository
+      )
+    )
   )
 
+
   override val routes = cors() {
-    petAdminExt.route
+    adminExtension.route
   }
+
+  startServer()
 }

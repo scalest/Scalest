@@ -5,73 +5,78 @@ import scalest.admin.Vue._
 
 trait ModelAdminTemplate {
 
-  def generate(modelName: String, modelViewRepr: List[(String, ModelView)]): String = html(
-    head(headImports()),
-    body(
-      div(id := "app")(
-        vApp(
-          vContent(
-            vContainer(
-              vCard(
-                vSnackbar(vModel := "notification")("""{{notificationText}}"""),
-                vToolbar(attr("color") := "white", attr("flat"))(
-                  tag("v-toolbar-title")(
-                    s"${modelName}s".capitalize
+  def generateHtml(ma: ModelAdmin[_]): String = {
+    html(
+      head(headImports()),
+      body(
+        raw(ma.template),
+        libsImports(),
+        script(adminVueScript(ma.modelName, ma.modelViewRepr))
+      )
+    ).render
+  }
+
+  def generateTemplate(modelName: String, modelViewRepr: List[(String, ModelView)]): String =
+    div(id := s"${modelName}App")(
+      vApp(
+        vContent(
+          vContainer(
+            vCard(
+              vSnackbar(vModel := "notification")("""{{notificationText}}"""),
+              vToolbar(attr("color") := "white", attr("flat"))(
+                tag("v-toolbar-title")(
+                  s"${modelName}s".capitalize
+                ),
+                tag("v-divider")(`class` := "mx-2", attr("inset"), attr("vertical")),
+                vSpacer(),
+                tag("v-dialog")(vModel := "dialog", maxWidth := "500px")(
+                  vBtn(
+                    attr("slot") := "activator",
+                    attr("color") := "primary",
+                    attr("dark"),
+                    `class` := "mb-2"
+                  )(
+                    "New Item"
                   ),
-                  tag("v-divider")(`class` := "mx-2", attr("inset"), attr("vertical")),
-                  vSpacer(),
-                  tag("v-dialog")(vModel := "dialog", maxWidth := "500px")(
-                    vBtn(
-                      attr("slot") := "activator",
-                      attr("color") := "primary",
-                      attr("dark"),
-                      `class` := "mb-2"
-                    )(
-                      "New Item"
+                  vCard(
+                    tag("v-card-title")(
+                      span(`class` := "headline")("""{{ formTitle }}""")
                     ),
-                    vCard(
-                      tag("v-card-title")(
-                        span(`class` := "headline")("""{{ formTitle }}""")
-                      ),
-                      tag("v-card-text")(
-                        vContainer(attr("grid-list-md"))(
-                          tag("v-layout")(attr("wrap"))(
-                            tag("v-flex")(attr("xs12"), attr("sm6"), attr("md4"))(
-                              for ((n, mf) <- modelViewRepr) yield raw(mf.toInput(n))
-                            )
+                    tag("v-card-text")(
+                      vContainer(attr("grid-list-md"))(
+                        tag("v-layout")(attr("wrap"))(
+                          tag("v-flex")(attr("xs12"), attr("sm6"), attr("md4"))(
+                            for ((n, mf) <- modelViewRepr) yield raw(mf.toInput(n))
                           )
                         )
-                      ),
-                      tag("v-card-actions")(
-                        vSpacer,
-                        vBtn(attr("color") := "blue darken-1", attr("flat"), `@click` := "close")("Cancel"),
-                        vBtn(attr("color") := "blue darken-1", attr("flat"), `@click` := "save")("Save")
                       )
+                    ),
+                    tag("v-card-actions")(
+                      vSpacer,
+                      vBtn(attr("color") := "blue darken-1", attr("flat"), `@click` := "close")("Cancel"),
+                      vBtn(attr("color") := "blue darken-1", attr("flat"), `@click` := "save")("Save")
                     )
                   )
-                ),
-                tag("v-data-table")(
-                  vBind("headers") := "headers",
-                  vBind("items") := "models",
-                  `class` := "elevation-1"
-                )(
-                  tag("template")(attr("slot") := "items", attr("slot-scope") := "props")(
-                    for ((n, mf) <- modelViewRepr) yield raw(mf.toOutput(n)),
-                    td(`class` := "layout")(
-                      vIcon(attr("small"), `class` := "mr-2", `@click` := "editItem(props.item)")("edit"),
-                      vIcon(attr("small"), `@click` := "deleteItem(props.item)")("delete")
-                    )
+                )
+              ),
+              tag("v-data-table")(
+                vBind("headers") := "headers",
+                vBind("items") := "models",
+                `class` := "elevation-1"
+              )(
+                tag("template")(attr("slot") := "items", attr("slot-scope") := "props")(
+                  for ((n, mf) <- modelViewRepr) yield raw(mf.toOutput(n)),
+                  td(`class` := "layout")(
+                    vIcon(attr("small"), `class` := "mr-2", `@click` := "editItem(props.item)")("edit"),
+                    vIcon(attr("small"), `@click` := "deleteItem(props.item)")("delete")
                   )
                 )
               )
             )
           )
         )
-      ),
-      libsImports(),
-      script(adminVueScript(modelName, modelViewRepr))
-    )
-  ).render
+      )
+    ).render
 
   private def libsImports() = {
     Seq(
@@ -113,7 +118,7 @@ trait ModelAdminTemplate {
       .mkString(",")
 
     raw(
-      // language=JavaScript
+      //       language=JavaScript
       s"""
         Vue.config.devtools = true;
 
@@ -149,7 +154,7 @@ trait ModelAdminTemplate {
 
         new Vue({
           mixins: [SnackbarNotificationQueue],
-          el: "#app",
+          el: "#${modelName}app",
           data() {
             return {
               dialog: false,
