@@ -24,6 +24,8 @@ trait ModelViewInstances {
     n => td(vCheckbox(vModel := s"props.item.$n", disabled)).render,
     n => s"""$n: this.editedItem.$n"""
   )
+
+  //Todo: capture all core Field types
 }
 
 object ModelViewInstances

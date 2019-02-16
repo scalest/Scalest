@@ -8,6 +8,26 @@ object Vue {
 
   implicit def attrToAttrPair(attr: Attr): AttrPair = attr.empty
 
+  lazy val vToolbarTitle = tag("v-toolbar-title")
+
+  lazy val vDivider = tag("v-divider")
+
+  lazy val vDialog = tag("v-dialog")
+
+  lazy val vCardTitle = tag("v-card-title")
+
+  lazy val vCardText = tag("v-card-text")
+
+  lazy val vLayout = tag("v-layout")
+
+  lazy val vFlex = tag("v-flex")
+
+  lazy val vCardActions = tag("v-card-actions")
+
+  lazy val vDataTable = tag("v-data-table")
+
+  lazy val vTemplate = tag("template")
+
   lazy val vCheckbox = tag("v-checkbox")
 
   lazy val vSwitch = tag("v-switch")
