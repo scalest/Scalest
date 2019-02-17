@@ -6,6 +6,19 @@ The main problem it tries to solve is faster creation of web applications with m
 business domain rather than on writing routine CRUD code and UI for working with it.
 
 ## Preview
+This piece of code creates admin routes for your Models:
+```scala
+  val adminExtension = new AdminExtension(
+    List(
+      new ModelAdmin(
+        "pet",
+        List("id" -> intIdMV, "name" -> strMV, "adopted" -> boolMV, "sex" -> enumMV[Sex]),
+        petRepository
+      )
+    )
+  )
+```
+
 >Item list:
 
 ![Models list](assets/list.png)
