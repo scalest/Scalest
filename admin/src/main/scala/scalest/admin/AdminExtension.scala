@@ -1,12 +1,11 @@
 package scalest.admin
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
-import akka.http.scaladsl.server.Route
-import scalest.ScalestService
-import ModelAdminTemplate._
+import akka.http.scaladsl.server.{Directives, Route}
+import scalest.admin.ModelAdminTemplate._
 
 class AdminExtension(modelAdmins: List[ModelAdmin[_]])
-  extends ScalestService {
+  extends Directives {
 
   val header: String = generateHeader(modelAdmins)
 

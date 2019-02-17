@@ -1,9 +1,10 @@
 package scalest.admin
 
-import scalatags.Text.all._
-import scalest.admin.Vue._
 import io.circe.syntax._
-import ReflectUtils._
+import scalatags.Text.all._
+import scalest.admin.ReflectUtils._
+import scalest.admin.Vue._
+
 import scala.reflect.runtime.universe.TypeTag
 
 trait ModelViewInstances {

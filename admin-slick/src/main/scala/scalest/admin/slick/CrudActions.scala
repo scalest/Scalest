@@ -48,5 +48,4 @@ trait CrudActions {
   def fetchAll(fetchSize: Int = 100)
               (implicit exc: ExecutionContext): StreamingDBIO[Seq[Entity], Entity]
 
-  // end::adoc[]
 }

@@ -4,10 +4,6 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.ExecutionContext
 
-/**
-  * Define basic life cycle actions for a Entity that involve.
-  *
-  */
 trait EntityActionsLike
   extends CrudActions {
 

@@ -1,15 +1,13 @@
 package scalest.admin
 
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.{Directives, Route}
+import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport
 import io.circe.{Decoder, Encoder}
-import scalest.ScalestService
-import scalest.json.CirceJsonSupport
-
 //Todo: Entities relations
 class ModelAdmin[Model: Encoder : Decoder](val modelName: String,
                                            val modelViewRepr: List[(String, ModelView)],
                                            val crudRepository: CrudRepository[Model])
-  extends ScalestService with ModelAdminTemplate with ModelAdminScript with CirceJsonSupport {
+  extends Directives with ModelAdminTemplate with ModelAdminScript with ErrorAccumulatingCirceSupport {
 
   val template: Template = generateTemplate(this)
 

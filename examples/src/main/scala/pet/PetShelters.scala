@@ -26,7 +26,7 @@ object PetShelters
 
     val name = column[String]("name")
 
-    val address = column[String]("adopted")
+    val address = column[String]("address")
 
     def read: ((Option[Int], String, String)) => PetShelter = {
       case (a, b, c) => PetShelter(a, b, parse(c).right.get.as[Address].right.get)
