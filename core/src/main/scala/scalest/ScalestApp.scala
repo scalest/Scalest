@@ -10,8 +10,8 @@ abstract class ScalestApp(appName: String = "scalest-app", modules: List[Module]
   extends HttpApp {
   def routes: Route
 
-  lazy val system: ActorSystem = ActorSystem(appName)
-  lazy val config: Config = system.settings.config
+  implicit lazy val system: ActorSystem = ActorSystem(appName)
+  implicit lazy val config: Config = system.settings.config
 
   val akkaModule: ModuleDef = new ModuleDef {
     make[ActorSystem].from(system)

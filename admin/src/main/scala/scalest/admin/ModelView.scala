@@ -2,28 +2,62 @@ package scalest.admin
 
 import scalatags.Text.all._
 import scalest.admin.Vue._
+import io.circe.syntax._
+import ReflectUtils._
+import scala.reflect.runtime.universe.TypeTag
 
 trait ModelViewInstances {
+
+  def parseField(parser: String => String = n => n)
+                (implicit n: String) =
+    s"""$n: ${parser(s"this.$editedItem")}"""
+
+  def editedItem(implicit n: String) = s"editedItem.$n"
+
+  def viewItem(implicit n: String) = s"props.item.$n"
+
   val intIdMV: ModelView = ModelView.instance(
     "0",
     _ => "",
-    n => td(s"{{ props.item.$n }}").render,
-    n => s"""$n: parseInt(this.editedItem.$n)"""
+    implicit n => s"{{ $viewItem }}",
+    implicit n => parseField(item => s"parseInt($item)")
   )
 
   val strMV: ModelView = ModelView.instance(
     "\"\"",
-    n => vTextField(vModel := s"editedItem.$n", attr("label") := n.capitalize).render,
-    n => td(s"{{ props.item.$n }}").render,
-    n => s"""$n: this.editedItem.$n"""
+    implicit n => vTextField(vModel := editedItem, attr("label") := n.capitalize).render,
+    implicit n => s"{{ $viewItem }}",
+    implicit n => parseField()
   )
 
   val boolMV: ModelView = ModelView.instance(
     "false",
-    n => vSwitch(vModel := s"editedItem.$n", attr("label") := n.capitalize).render,
-    n => td(vCheckbox(vModel := s"props.item.$n", disabled)).render,
-    n => s"""$n: this.editedItem.$n"""
+    implicit n => vSwitch(vModel := editedItem, attr("label") := n.capitalize).render,
+    implicit n => vIcon(vBind("color") := s"""$viewItem? "green": "red" """)(s"""{{ $viewItem ? "check_circle" : "cancel"}}""")
+      .render,
+    implicit n => parseField()
   )
+
+  def enumMV[T <: Enumeration#Value : TypeTag]: ModelView = {
+    val enum = getEnum[T]
+    val enumName = enum.toString()
+    val defaultValue = enum.values.head.toString.asJson.noSpaces
+    val enumValues = enum.values.map(el => s""""$el"""").mkString("[", ",", "]")
+
+    ModelView.instance(
+      defaultValue,
+      implicit n => {
+        vSelect(
+          vModel := editedItem,
+          attr("label") := enumName,
+          attr("solo"),
+          vBind("items") := enumValues
+        ).render
+      },
+      implicit n => s"{{ $viewItem }}",
+      implicit n => parseField()
+    )
+  }
 
   //Todo: capture all core Field types
 }

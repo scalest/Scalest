@@ -1,8 +1,11 @@
 package pet
 
-import pet.PetModel._
+import pet.PetModel.Sexes.Sex
+import pet.PetModel.{Sexes, _}
 import scalest.admin.admin.H2ProfileProvider
 import scalest.admin.slick._
+import slick.ast.BaseTypedType
+import slick.jdbc.JdbcType
 
 object Pets
   extends EntityActions with H2ProfileProvider {
@@ -17,6 +20,10 @@ object Pets
 
   val pets, tableQuery = TableQuery[PetsTable]
 
+  implicit val sexEnumMapper: JdbcType[Sex] with BaseTypedType[Sex] = {
+    MappedColumnType.base[Sex, String](_.toString, Sexes.withName)
+  }
+
   class PetsTable(tag: Tag)
     extends Table[Pet](tag, "pets") with Identified {
 
@@ -26,7 +33,9 @@ object Pets
 
     val adopted = column[Boolean]("adopted")
 
-    override def * = (id.?, name, adopted).mapTo[Pet]
+    val sex = column[Sex]("sex")
+
+    override def * = (id.?, name, adopted, sex).mapTo[Pet]
   }
 
 }

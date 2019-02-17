@@ -3,6 +3,7 @@ package pet
 import akka.actor.ActorSystem
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import distage._
+import pet.PetModel.Sexes.Sex
 import scalest.ScalestApp
 import scalest.admin.ModelViewInstances._
 import scalest.admin.{AdminExtension, ModelAdmin}
@@ -29,7 +30,7 @@ object PetApp
     List(
       new ModelAdmin(
         "pet",
-        List("id" -> intIdMV, "name" -> strMV, "adopted" -> boolMV),
+        List("id" -> intIdMV, "name" -> strMV, "adopted" -> boolMV, "sex" -> enumMV[Sex]),
         petRepository
       )
     )

@@ -79,7 +79,7 @@ trait ModelAdminTemplate {
             vCardText(
               vContainer(attr("grid-list-md"))(
                 vLayout(attr("wrap"))(
-                  vFlex(attr("xs12"), attr("sm6"), attr("md4"))(
+                  vFlex(attr("xs12"), attr("sm12"), attr("md12"))(
                     for ((n, mf) <- modelViewRepr) yield raw(mf.toInput(n))
                   )
                 )
@@ -99,7 +99,7 @@ trait ModelAdminTemplate {
         `class` := "elevation-1"
       )(
         vTemplate(attr("slot") := "items", attr("slot-scope") := "props")(
-          for ((n, mf) <- modelViewRepr) yield raw(mf.toOutput(n)),
+          for ((n, mf) <- modelViewRepr) yield td(raw(mf.toOutput(n))),
           td(`class` := "layout")(
             vIcon(attr("small"), `class` := "mr-2", `@click` := "editItem(props.item)")("edit"),
             vIcon(attr("small"), `@click` := "deleteItem(props.item)")("delete")
@@ -114,8 +114,12 @@ trait ModelAdminTemplate {
       script(src := "https://cdn.jsdelivr.net/npm/vue/dist/vue.js"),
       script(src := "https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"),
       script(src := "https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"),
-      script(src := "https://cdn.jsdelivr.net/npm/vuelidate@0.7.4/dist/vuelidate.min.js")
-    )
+      script(src := "https://cdn.jsdelivr.net/npm/vuelidate@0.7.4/dist/vuelidate.min.js"),
+      //Todo: Use tui for markdown textfields
+      //script(src := "https://cdnjs.cloudflare.com/ajax/libs/tui-editor/1.3.0/tui-editor-Editor.min.js"),
+      //Todo: Use jsoneditor for json fields
+      //script(src := "https://cdn.jsdelivr.net/npm/@json-editor/json-editor@latest/dist/jsoneditor.min.js")
+      )
   }
 
   private def headImports() = {

@@ -8,6 +8,8 @@ object Vue {
 
   implicit def attrToAttrPair(attr: Attr): AttrPair = attr.empty
 
+  lazy val vSelect = tag("v-select")
+
   lazy val vToolbarTitle = tag("v-toolbar-title")
 
   lazy val vDivider = tag("v-divider")

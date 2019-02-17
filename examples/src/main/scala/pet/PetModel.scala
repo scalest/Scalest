@@ -19,7 +19,16 @@ object PetModel
     implicit val ed: `E&D`[PetShelter] = circeObject
   }
 
-  case class Pet(id: Option[Int] = None, name: String, adopted: Boolean)
+  object Sexes
+    extends Enumeration {
+    type Sex = Value
+    val Male = Value("MALE")
+    val Female = Value("FEMALE")
+
+    implicit val ed: `E&D`[Sexes.Value] = circeEnum(this)
+  }
+
+  case class Pet(id: Option[Int] = None, name: String, adopted: Boolean, sex: Sexes.Value)
 
   object Pet {
     def tupled = (Pet.apply _).tupled
