@@ -120,7 +120,7 @@ trait FieldTypeViewInstances {
           vBind("items") := enumValues
         ).render
       },
-      implicit n => s"{{ $viewItem }}",
+      implicit n => tag("v-chip")(`class` := "primary", attr("text-color") := "white")(s"{{ $viewItem }}").render,
       implicit n => parseField()
     )
   }
