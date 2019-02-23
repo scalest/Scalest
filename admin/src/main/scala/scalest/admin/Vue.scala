@@ -8,6 +8,20 @@ object Vue {
 
   implicit def attrToAttrPair(attr: Attr): AttrPair = attr.empty
 
+  lazy val emptyFrag: Frag = ""
+
+  lazy val vColor = attr("color")
+
+  lazy val vToolbarSideIcon = tag("v-toolbar-side-icon")
+
+  lazy val vMenu = tag("v-menu")
+
+  lazy val vList = tag("v-list")
+
+  lazy val vListTile = tag("v-list-tile")
+
+  lazy val vListTileTitle = tag("v-list-tile-title")
+
   lazy val vSelect = tag("v-select")
 
   lazy val vToolbarTitle = tag("v-toolbar-title")

@@ -3,9 +3,7 @@ package pet
 import akka.actor.ActorSystem
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import distage._
-import pet.PetModel.Sexes.Sex
 import scalest.ScalestApp
-import scalest.admin.ModelViewInstances._
 import scalest.admin.{AdminExtension, ModelAdmin}
 import slick.basic.DatabaseConfig
 import slick.jdbc.H2Profile
@@ -26,16 +24,22 @@ object PetApp
 
   val petRepository: PetRepository = locator.get[PetRepository]
 
-  private val adminExtension = new AdminExtension(
-    List(
-      new ModelAdmin(
-        "pet",
-        List("id" -> intIdMV, "name" -> strMV, "adopted" -> boolMV, "sex" -> enumMV[Sex]),
-        petRepository
-      )
-    )
-  )
+  /*//Manual modelView creation
+  import scalest.admin._
 
+  implicit val modelView = ModelView[Pet](
+    "pet",
+    Seq(
+      //Can change write flag, read flag, parse function and default value
+      FieldView("id", intFTV, writeable = false),
+      FieldView("name", strFTV),
+      FieldView("adopted", boolFTV),
+      FieldView("sex", enumFTV[Sex])
+    )
+  )*/
+
+  //Automatic modelView generation all can be customized using annotations
+  val adminExtension = new AdminExtension(ModelAdmin(petRepository))
 
   override val routes = cors() {
     adminExtension.route

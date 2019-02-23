@@ -1,5 +1,6 @@
 package pet
 
+import scalest.admin.NoWrite
 import scalest.json.{CirceJsonSupport, `E&D`}
 
 object PetModel
@@ -28,7 +29,11 @@ object PetModel
     implicit val ed: `E&D`[Sexes.Value] = circeEnum(this)
   }
 
-  case class Pet(id: Option[Int] = None, name: String, adopted: Boolean, sex: Sexes.Value)
+  case class Pet(@NoWrite
+                 id: Option[Int] = None,
+                 name: String,
+                 adopted: Boolean,
+                 sex: Sexes.Value)
 
   object Pet {
     def tupled = (Pet.apply _).tupled

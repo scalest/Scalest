@@ -5,18 +5,33 @@ import scalatags.Text.all._
 trait ModelAdminScript {
   type Script = String
 
-  def generateScript(ma: ModelAdmin[_]): Script = script(adminVueScript(ma.modelName, ma.modelViewRepr)).render
+  def generateScript(ma: ModelAdmin[_]): Script = script(adminVueScript(ma.modelView)).render
 
   //Todo: Entity Validation using annotations
-  private def adminVueScript(modelName: String, modelViewRepr: List[(String, ModelView)]) = {
-    def renderHeaders() = (for ((n, _) <- modelViewRepr) yield s"""{ text: "${n.capitalize}", value: "$n" }""")
-      .mkString("", ",", ",")
+  private def adminVueScript(mv: ModelView[_]) = {
+    import mv._
 
-    def renderDefaults() = (for ((n, mv) <- modelViewRepr) yield s"""$n: ${mv.defaultValue()}""")
-      .mkString(",")
+    def renderHeaders() = {
+      val headers = modelRepr.map { fv =>
+        import fv._
 
-    def renderFormParse() = (for ((n, mv) <- modelViewRepr) yield s"""${mv.parseForm(n)}""")
-      .mkString(",")
+        if (readable) {
+          s"""{ text: "${name.capitalize}", value: "$name" }"""
+        } else ""
+      }
+
+      if (headers.isEmpty) ""
+      else headers.mkString("", ",", ",")
+    }
+
+    def renderDefaults() = modelRepr.map { fv =>
+      import fv._
+      s"""$name: ${ftv.defaultValue()}"""
+    }.mkString(",")
+
+    def renderFormParse() = modelRepr.map { fv =>
+      s"""${fv.parseForm()}"""
+    }.mkString(",")
 
     raw(
       //       language=JavaScript

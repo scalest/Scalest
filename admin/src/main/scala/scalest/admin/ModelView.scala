@@ -1,92 +1,33 @@
 package scalest.admin
 
-import io.circe.syntax._
-import scalatags.Text.all._
-import scalest.admin.ReflectUtils._
-import scalest.admin.Vue._
+import magnolia.{CaseClass, Magnolia}
+import scalest.admin.Utils._
 
-import scala.reflect.runtime.universe.TypeTag
+import scala.language.experimental.macros
 
-trait ModelViewInstances {
+case class ModelView[T](modelName: String, modelRepr: ModelRepr)
 
-  def parseField(parser: String => String = n => n)
-                (implicit n: String) =
-    s"""$n: ${parser(s"this.$editedItem")}"""
+object ModelView
+  extends FieldTypeViewInstances {
 
-  def editedItem(implicit n: String) = s"editedItem.$n"
+  implicit def gen[T]: ModelView[T] = macro Magnolia.gen[T]
 
-  def viewItem(implicit n: String) = s"props.item.$n"
+  type Typeclass[T] = FieldTypeView[T]
 
-  val intIdMV: ModelView = ModelView.instance(
-    "0",
-    _ => "",
-    implicit n => s"{{ $viewItem }}",
-    implicit n => parseField(item => s"parseInt($item)")
-  )
-
-  val strMV: ModelView = ModelView.instance(
-    "\"\"",
-    implicit n => vTextField(vModel := editedItem, attr("label") := n.capitalize).render,
-    implicit n => s"{{ $viewItem }}",
-    implicit n => parseField()
-  )
-
-  val boolMV: ModelView = ModelView.instance(
-    "false",
-    implicit n => vSwitch(vModel := editedItem, attr("label") := n.capitalize).render,
-    implicit n => vIcon(vBind("color") := s"""$viewItem? "green": "red" """)(s"""{{ $viewItem ? "check_circle" : "cancel"}}""")
-      .render,
-    implicit n => parseField()
-  )
-
-  def enumMV[T <: Enumeration#Value : TypeTag]: ModelView = {
-    val enum = getEnum[T]
-    val enumName = enum.toString()
-    val defaultValue = enum.values.head.toString.asJson.noSpaces
-    val enumValues = enum.values.map(el => s""""$el"""").mkString("[", ",", "]")
-
-    ModelView.instance(
-      defaultValue,
-      implicit n => {
-        vSelect(
-          vModel := editedItem,
-          attr("label") := enumName,
-          attr("solo"),
-          vBind("items") := enumValues
-        ).render
-      },
-      implicit n => s"{{ $viewItem }}",
-      implicit n => parseField()
+  def combine[T](ctx: CaseClass[FieldTypeView, T]): ModelView[T] = {
+    new ModelView(
+      Utils.snakify(ctx.typeName.short),
+      ctx.parameters.map { p =>
+        FieldView(
+          name = p.label,
+          ftv = p.typeclass,
+          writeable = p.annotations.findOfType[NoWrite].forall(_ => false),
+          readable = p.annotations.findOfType[NoRead].forall(_ => false),
+          default = p.annotations.findOfType[DefaultValue].map(_.default),
+          parse = p.annotations.findOfType[FormParse].map(_.parse)
+        )
+      }
     )
   }
 
-  //Todo: capture all core Field types
-}
-
-object ModelViewInstances
-  extends ModelViewInstances
-
-trait ModelView {
-  def toInput(name: String): String
-
-  def toOutput(name: String): String
-
-  def parseForm(name: String): String
-
-  def defaultValue(): String
-}
-
-object ModelView {
-  def instance(defaultVal: String,
-               toInputFunc: String => String,
-               toOutputFunc: String => String,
-               parseFormFunc: String => String): ModelView = new ModelView {
-    override def toInput(name: String): String = toInputFunc(name)
-
-    override def toOutput(name: String): String = toOutputFunc(name)
-
-    override def parseForm(name: String): String = parseFormFunc(name)
-
-    override def defaultValue(): String = defaultVal
-  }
 }

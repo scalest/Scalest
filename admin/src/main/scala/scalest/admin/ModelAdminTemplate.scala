@@ -8,11 +8,12 @@ trait ModelAdminTemplate {
   type Template = String
 
   def generateSingleModelHtml(header: Header, ma: ModelAdmin[_]): String = {
-    import ma.{modelName, script, template}
+    import ma.{modelView, script, template}
+
     html(
       head(headImports()),
       body(
-        div(id := s"${modelName}App")(
+        div(id := s"${modelView.modelName}App")(
           vApp(
             vContent(
               vContainer(
@@ -28,22 +29,22 @@ trait ModelAdminTemplate {
     ).render
   }
 
-  def generateHeader(mas: List[ModelAdmin[_]]): Header =
-    vCard(attr("color") := "grey lighten-4", attr("flat"), height := "100px", attr("tile"))(
-      tag("v-toolbar")(attr("dense"))(
-        tag("v-toolbar-side-icon"),
-        tag("v-toolbar-title")("Scalest Admin"),
+  def generateHeader(mas: Seq[ModelAdmin[_]]): Header = {
+    vCard(vColor := "grey lighten-4", attr("flat"), height := "100px", attr("tile"))(
+      vToolbar(attr("dense"))(
+        vToolbarSideIcon,
+        vToolbarTitle("Scalest Admin"),
         vSpacer,
-        tag("v-menu")(vBind("nudge-width") := "100")(
-          tag("v-toolbar-title")(attr("slot") := "activator")(
+        vMenu(vBind("nudge-width") := "100")(
+          vToolbarTitle(attr("slot") := "activator")(
             span("Models"),
-            tag("v-icon")("arrow_drop_down")
+            vIcon("arrow_drop_down")
           ),
-          tag("v-list")(
+          vList(
             for (ma <- mas) yield {
-              tag("v-list-tile")(
-                tag("v-list-tile-title")(
-                  a(href := s"/admin/${ma.modelName}")(ma.modelName.capitalize)
+              vListTile(
+                vListTileTitle(
+                  a(href := s"/admin/${ma.modelView.modelName}")(ma.modelView.modelName.capitalize)
                 )
               )
             }
@@ -52,21 +53,23 @@ trait ModelAdminTemplate {
       )
 
     ).render
+  }
 
   def generateTemplate(ma: ModelAdmin[_]): Template = {
-    import ma._
+    import ma.modelView._
+
     vCard(
       vSnackbar(vModel := "notification")("""{{notificationText}}"""),
-      vToolbar(attr("color") := "white", attr("flat"))(
+      vToolbar(vColor := "white", attr("flat"))(
         vToolbarTitle(
-          s"${modelName}s".capitalize
+          s"${ma.modelView.modelName.replaceAll("_", " ")}s".capitalize
         ),
         vDivider(`class` := "mx-2", attr("inset"), attr("vertical")),
         vSpacer(),
         vDialog(vModel := "dialog", maxWidth := "500px")(
           vBtn(
             attr("slot") := "activator",
-            attr("color") := "primary",
+            vColor := "primary",
             attr("dark"),
             `class` := "mb-2"
           )(
@@ -80,15 +83,15 @@ trait ModelAdminTemplate {
               vContainer(attr("grid-list-md"))(
                 vLayout(attr("wrap"))(
                   vFlex(attr("xs12"), attr("sm12"), attr("md12"))(
-                    for ((n, mf) <- modelViewRepr) yield raw(mf.toInput(n))
+                    modelRepr.map(_.toInput())
                   )
                 )
               )
             ),
             vCardActions(
               vSpacer,
-              vBtn(attr("color") := "blue darken-1", attr("flat"), `@click` := "close")("Cancel"),
-              vBtn(attr("color") := "blue darken-1", attr("flat"), `@click` := "save")("Save")
+              vBtn(vColor := "blue darken-1", attr("flat"), `@click` := "close")("Cancel"),
+              vBtn(vColor := "blue darken-1", attr("flat"), `@click` := "save")("Save")
             )
           )
         )
@@ -99,7 +102,7 @@ trait ModelAdminTemplate {
         `class` := "elevation-1"
       )(
         vTemplate(attr("slot") := "items", attr("slot-scope") := "props")(
-          for ((n, mf) <- modelViewRepr) yield td(raw(mf.toOutput(n))),
+          modelRepr.map(_.toOutput()),
           td(`class` := "layout")(
             vIcon(attr("small"), `class` := "mr-2", `@click` := "editItem(props.item)")("edit"),
             vIcon(attr("small"), `@click` := "deleteItem(props.item)")("delete")

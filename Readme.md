@@ -6,19 +6,16 @@ The main problem it tries to solve is faster creation of web applications with m
 business domain rather than on writing routine CRUD code and UI for working with it.
 
 ## Preview
-This piece of code creates admin routes for your Models:
+You only need to provide CRUD repository and mount generated route in your application,
+for example like this:
 ```scala
-  val adminExtension = new AdminExtension(
-    List(
-      new ModelAdmin(
-        "pet",
-        List("id" -> intIdMV, "name" -> strMV, "adopted" -> boolMV, "sex" -> enumMV[Sex]),
-        petRepository
-      )
-    )
-  )
-```
+val adminExtension = new AdminExtension(ModelAdmin(petRepository))
 
+val routes = cors() {
+  adminExtension.route
+}
+```
+And this is how you get such admin panel:
 >Item list:
 
 ![Models list](assets/list.png)
@@ -32,7 +29,7 @@ This piece of code creates admin routes for your Models:
 ![Models edit](assets/edit.png)
 
 ## Modules
-- Core - main building blocks of Scalest application
+- Core - distage based akka application aka Scalest application
 - Admin - automatic admin panel for Models
-- Admin-Slick - Admin extension for Slick Tables
+- Admin-Slick - slick backend for Scalest-Admin module
 - Examples - example applications using Scalest

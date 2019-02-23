@@ -3,10 +3,11 @@ package scalest.admin
 import akka.http.scaladsl.server.{Directives, Route}
 import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport
 import io.circe.{Decoder, Encoder}
+
 //Todo: Entities relations
-class ModelAdmin[Model: Encoder : Decoder](val modelName: String,
-                                           val modelViewRepr: List[(String, ModelView)],
-                                           val crudRepository: CrudRepository[Model])
+class ModelAdmin[Model: Encoder : Decoder](val crudRepository: CrudRepository[Model],
+                                           val modelView: ModelView[Model])
+
   extends Directives with ModelAdminTemplate with ModelAdminScript with ErrorAccumulatingCirceSupport {
 
   val template: Template = generateTemplate(this)
@@ -35,4 +36,11 @@ class ModelAdmin[Model: Encoder : Decoder](val modelName: String,
         entity(as[Seq[Int]])(ids => complete(crudRepository.deleteAll(ids)))
       }
   }
+}
+
+object ModelAdmin {
+  def apply[Model: Encoder : Decoder : ModelView](crudRepository: CrudRepository[Model]): ModelAdmin[Model] = new ModelAdmin(
+    crudRepository = crudRepository,
+    modelView = implicitly
+  )
 }

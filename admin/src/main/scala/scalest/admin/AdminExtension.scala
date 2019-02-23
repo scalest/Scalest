@@ -4,7 +4,7 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.{Directives, Route}
 import scalest.admin.ModelAdminTemplate._
 
-class AdminExtension(modelAdmins: List[ModelAdmin[_]])
+class AdminExtension(modelAdmins: ModelAdmin[_]*)
   extends Directives {
 
   val header: String = generateHeader(modelAdmins)
@@ -12,7 +12,8 @@ class AdminExtension(modelAdmins: List[ModelAdmin[_]])
   val route: Route = pathPrefix("admin") {
     modelAdmins.map { ma =>
       val html = generateSingleModelHtml(header, ma)
-      pathPrefix(ma.modelName) {
+
+      pathPrefix(ma.modelView.modelName) {
         complete(
           HttpEntity(
             ContentTypes.`text/html(UTF-8)`,
