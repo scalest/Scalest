@@ -1,13 +1,43 @@
 package scalest.admin
 
 import scalatags.Text.all._
-import scalest.admin.Vue._
+import scalest.admin.Vue.{vCardTitle, _}
 
 trait ModelAdminTemplate {
   type Header = String
   type Template = String
 
-  def generateSingleModelHtml(header: Header, ma: ModelAdmin[_]): String = {
+  def generateMainPageHtml(header: Header): String = {
+    html(
+      head(headImports()),
+      body(
+        div(id := s"scalest-menu")(
+          vApp(
+            vContent(
+              vContainer(
+                raw(header),
+                vLayout(`class` := "align-center justify-center row fill-height")(
+                  tag("v-carousel")(
+                    tag("v-carousel-item")(attr("key") := "0", src := "/images/scalest.png", )
+                  )
+                )
+              )
+            )
+          )
+        ),
+        libsImports(),
+        // language=JavaScript
+        script(raw(
+          s"""
+           new Vue({
+             el: "#scalest-menu"
+           });
+           """))
+      )
+    ).render
+  }
+
+  def generateSingleModelHtml(header: Header, ma: ModelAdmin[_, _]): String = {
     import ma.{modelView, script, template}
 
     html(
@@ -29,13 +59,14 @@ trait ModelAdminTemplate {
     ).render
   }
 
-  def generateHeader(mas: Seq[ModelAdmin[_]]): Header = {
-    vCard(vColor := "grey lighten-4", attr("flat"), height := "100px", attr("tile"))(
+  def generateHeader(mas: Seq[ModelAdmin[_, _]]): Header = {
+    vCard(attr("flat"), attr("tile"), `class` := "mb-3")(
       vToolbar(attr("dense"))(
         vToolbarSideIcon,
-        vToolbarTitle("Scalest Admin"),
+        vToolbarTitle(attr("flat"))(
+          vBtn(href := "/admin")(span("Scalest Admin"))),
         vSpacer,
-        vMenu(vBind("nudge-width") := "100")(
+        vMenu(
           vToolbarTitle(attr("slot") := "activator")(
             span("Models"),
             vIcon("arrow_drop_down")
@@ -51,11 +82,10 @@ trait ModelAdminTemplate {
           )
         )
       )
-
     ).render
   }
 
-  def generateTemplate(ma: ModelAdmin[_]): Template = {
+  def generateTemplate(ma: ModelAdmin[_, _]): Template = {
     import ma.modelView._
 
     vCard(
