@@ -16,9 +16,15 @@ trait ModelAdminTemplate {
             vContent(
               vContainer(
                 raw(header),
-                vLayout(`class` := "align-center justify-center row fill-height")(
+                vLayout(`class` := "align-center justify-center row")(
                   tag("v-carousel")(
-                    tag("v-carousel-item")(attr("key") := "0", src := "/images/scalest.png", )
+                    tag("v-carousel-item")(`class` := "my-1", attr("key") := "0")(
+                      vContainer(`class` := "fill-heigth")(
+                        vLayout(`class` := "align-center justify-center")(
+                          img(src := "/images/scalest.png", style := "max-width:100%;max-height:100%;")
+                        )
+                      )
+                    )
                   )
                 )
               )
@@ -27,12 +33,15 @@ trait ModelAdminTemplate {
         ),
         libsImports(),
         // language=JavaScript
-        script(raw(
-          s"""
+        script(
+          raw(
+            s"""
            new Vue({
              el: "#scalest-menu"
            });
-           """))
+           """
+          )
+        )
       )
     ).render
   }
@@ -64,19 +73,18 @@ trait ModelAdminTemplate {
       vToolbar(attr("dense"))(
         vToolbarSideIcon,
         vToolbarTitle(attr("flat"))(
-          vBtn(href := "/admin")(span("Scalest Admin"))),
+          vBtn(href := "/admin")(span("Scalest Admin"))
+        ),
         vSpacer,
-        vMenu(
+        vMenu(attr("offset-y"))(
           vToolbarTitle(attr("slot") := "activator")(
             span("Models"),
             vIcon("arrow_drop_down")
           ),
           vList(
             for (ma <- mas) yield {
-              vListTile(
-                vListTileTitle(
-                  a(href := s"/admin/${ma.modelView.modelName}")(ma.modelView.modelName.capitalize)
-                )
+              vListTile(href := s"/admin/${ma.modelView.modelName}", attr("ripple"))(
+                ma.modelView.modelName.capitalize
               )
             }
           )
