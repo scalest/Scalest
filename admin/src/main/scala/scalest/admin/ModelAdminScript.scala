@@ -5,7 +5,7 @@ import scalatags.Text.all._
 trait ModelAdminScript {
   type Script = String
 
-  def generateScript(ma: ModelAdmin[_]): Script = script(adminVueScript(ma.modelView)).render
+  def generateScript(ma: ModelAdmin[_, _]): Script = script(adminVueScript(ma.modelView)).render
 
   //Todo: Entity Validation using annotations
   private def adminVueScript(mv: ModelView[_]) = {
@@ -121,12 +121,11 @@ trait ModelAdminScript {
               this.editedItem = Object.assign({}, item);
               this.dialog = true;
             },
-
             deleteItem(item) {
               const index = this.models.indexOf(item);
               if (confirm("Are you sure you want to delete this item?")) {
                 axios
-                  .delete(`/api/${modelName}s/$${item.id}`)
+                  .delete(`/api/${modelName}s`, { data: [item.id] })
                   .then(r => {
                     this.models.splice(index, 1);
                     this.addNotification("Successfully deleted item");

@@ -5,8 +5,8 @@ import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport
 import io.circe.{Decoder, Encoder}
 
 //Todo: Entities relations
-class ModelAdmin[Model: Encoder : Decoder](val crudRepository: CrudRepository[Model],
-                                           val modelView: ModelView[Model])
+class ModelAdmin[Model: Encoder : Decoder, Id: Encoder : Decoder](val crudRepository: CrudRepository[Model, Id],
+                                                                  val modelView: ModelView[Model])
 
   extends Directives with ModelAdminTemplate with ModelAdminScript with ErrorAccumulatingCirceSupport {
 
@@ -19,7 +19,7 @@ class ModelAdmin[Model: Encoder : Decoder](val crudRepository: CrudRepository[Mo
   //Todo: Custom Actions endpoint operation
   //Todo: Delete Selected operation
   //Todo: Entity Validation using annotations
-  val route: Route = pathPrefix("pets") {
+  val route: Route = pathPrefix(s"${modelView.modelName}s") {
     (get & pathEndOrSingleSlash) {
       complete(crudRepository.findAll())
     } ~
@@ -27,19 +27,16 @@ class ModelAdmin[Model: Encoder : Decoder](val crudRepository: CrudRepository[Mo
         entity(as[Model])(m => complete(crudRepository.create(m)))
       } ~
       (put & pathEndOrSingleSlash) {
-        entity(as[Model])(m => complete(crudRepository.upsert(m)))
-      } ~ //Todo: Support for More Id types, probably use delete all like interface
-      (delete & pathPrefix(IntNumber) & pathEndOrSingleSlash) { id =>
-        complete(crudRepository.delete(id))
+        entity(as[Model])(m => complete(crudRepository.update(m)))
       } ~
       (delete & pathEndOrSingleSlash) {
-        entity(as[Seq[Int]])(ids => complete(crudRepository.deleteAll(ids)))
+        entity(as[Seq[Id]])(ids => complete(crudRepository.delete(ids)))
       }
   }
 }
 
 object ModelAdmin {
-  def apply[Model: Encoder : Decoder : ModelView](crudRepository: CrudRepository[Model]): ModelAdmin[Model] = new ModelAdmin(
+  def apply[Model: Encoder : Decoder : ModelView, Id: Encoder : Decoder](crudRepository: CrudRepository[Model, Id]): ModelAdmin[Model, Id] = new ModelAdmin(
     crudRepository = crudRepository,
     modelView = implicitly
   )

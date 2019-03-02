@@ -41,9 +41,7 @@ object PetApp
   //Automatic modelView generation all can be customized using annotations
   val adminExtension = new AdminExtension(ModelAdmin(petRepository))
 
-  override val routes = cors() {
-    adminExtension.route
-  }
+  override val routes = adminExtension.route
 
   startServer()
 }
