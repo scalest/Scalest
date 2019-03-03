@@ -10,17 +10,19 @@ import scala.language.experimental.macros
 import scala.reflect.runtime.universe.TypeTag
 
 
+case class FieldMeta(fieldName: String, accessorName: String)
+
 case class FieldView(name: String,
                      ftv: FieldTypeView[_],
                      writeable: Boolean = true,
                      readable: Boolean = true,
                      default: Option[String] = None,
-                     parse: Option[String => String] = None) {
-  def toInput(): Frag = if (writeable) raw(ftv.toInput(name)) else emptyFrag
+                     parse: Option[FieldMeta => String] = None) {
+  def toInput(): Frag = if (writeable) raw(ftv.toInput(FieldMeta(name, s"editedItem.$name"))) else emptyFrag
 
-  def toOutput(): Frag = if (readable) td(raw(ftv.toOutput(name))) else td
+  def toOutput(): Frag = if (readable) td(raw(ftv.toOutput(FieldMeta(name, s"props.item.$name")))) else td
 
-  def parseForm(): String = parse.getOrElse(ftv.parseForm _)(name)
+  def parseForm(): String = parse.getOrElse(ftv.parseForm _)(FieldMeta(name, s"this.editedItem.$name"))
 
   def defaultValue(): String = default.getOrElse(ftv.defaultValue())
 }
@@ -34,31 +36,43 @@ class NoWrite
 final case class DefaultValue(default: String)
   extends StaticAnnotation
 
-final case class FormParse(parse: String => String)
+final case class FormParse(parse: FieldMeta => String)
   extends StaticAnnotation
 
 
 trait FieldTypeView[T] {
-  def toInput(name: String): String
+  def toInput(meta: FieldMeta): String
 
-  def toOutput(name: String): String
+  def toOutput(meta: FieldMeta): String
 
-  def parseForm(name: String): String
+  def parseForm(meta: FieldMeta): String
 
   def defaultValue(): String
+
+  def polymap[Other](default: String = defaultValue(),
+                     input: FieldMeta => String = toInput,
+                     output: FieldMeta => String = toOutput,
+                     parse: FieldMeta => String = parseForm): FieldTypeView[Other] = FieldTypeView.instance(
+    default,
+    input,
+    output,
+    parse
+  )
+
+  def copy[Other]: FieldTypeView[Other] = FieldTypeView.instance(defaultValue(), toInput, toOutput, parseForm)
 }
 
 object FieldTypeView {
 
   def instance[T](default: String,
-                  input: String => String,
-                  output: String => String,
-                  parse: String => String): FieldTypeView[T] = new FieldTypeView[T] {
-    override def toInput(name: String): String = input(name)
+                  input: FieldMeta => String,
+                  output: FieldMeta => String,
+                  parse: FieldMeta => String): FieldTypeView[T] = new FieldTypeView[T] {
+    override def toInput(meta: FieldMeta): String = input(meta)
 
-    override def toOutput(name: String): String = output(name)
+    override def toOutput(meta: FieldMeta): String = output(meta)
 
-    override def parseForm(name: String): String = parse(name)
+    override def parseForm(meta: FieldMeta): String = parse(meta)
 
     override def defaultValue(): String = default
   }
@@ -66,34 +80,61 @@ object FieldTypeView {
 
 trait FieldTypeViewInstances {
 
-  def parseField(parser: String => String = n => n)
-                (implicit n: String) =
-    s"""$n: ${parser(s"this.$editedItem")}"""
+  def parseField(meta: FieldMeta, parser: String => String = n => n) =
+    s"""${meta.fieldName}: ${parser(meta.accessorName)}"""
 
-  def editedItem(implicit n: String) = s"editedItem.$n"
-
-  def viewItem(implicit n: String) = s"props.item.$n"
 
   implicit val intFTV: FieldTypeView[Int] = FieldTypeView.instance(
     "0",
-    implicit n => vTextField(vModel := editedItem, `type` := "number", attr("label") := n.capitalize).render,
-    implicit n => s"{{ $viewItem }}",
-    implicit n => parseField(item => s"parseInt($item)")
+    meta => vTextField(vModel := meta.accessorName, `type` := "number", attr("label") := meta.fieldName.capitalize).render,
+    meta => s"{{ ${meta.accessorName} }}",
+    meta => parseField(meta, item => s"parseInt($item)")
   )
+
+
+  implicit def seqFTV[T](implicit elementFTV: FieldTypeView[T]): FieldTypeView[Seq[T]] = FieldTypeView.instance(
+    default = "[]",
+    meta => "",
+    meta => vMenu(attr("offset-y"))(
+      vToolbarTitle(attr("slot") := "activator")(
+        span(meta.fieldName.capitalize),
+        vIcon("arrow_drop_down")
+      ),
+      vList(
+        vListTile(vFor := "(item, index) in items", vBind("key") := "index")(
+          elementFTV.toOutput(FieldMeta("index", "item"))
+        )
+      )
+    ).render,
+    meta => parseField(meta)
+  )
+
+  implicit val shortFTV: FieldTypeView[Short] = intFTV.copy
+
+  implicit val longFTV: FieldTypeView[Char] = intFTV.copy
+
+  implicit val byteFTV: FieldTypeView[Byte] = intFTV.copy
+
+  implicit val charFTV: FieldTypeView[Char] = intFTV.copy
 
   implicit val strFTV: FieldTypeView[String] = FieldTypeView.instance(
     "\"\"",
-    implicit n => vTextField(vModel := editedItem, attr("label") := n.capitalize).render,
-    implicit n => s"{{ $viewItem }}",
-    implicit n => parseField()
+    meta => vTextField(vModel := meta.accessorName, attr("label") := meta.fieldName.capitalize).render,
+    meta => s"{{ ${meta.accessorName} }}",
+    meta => parseField(meta)
   )
 
   implicit val boolFTV: FieldTypeView[Boolean] = FieldTypeView.instance(
     "false",
-    implicit n => vSwitch(vModel := editedItem, attr("label") := n.capitalize).render,
-    implicit n => vIcon(vBind("color") := s"""$viewItem? "green": "red" """)(s"""{{ $viewItem ? "check_circle" : "cancel"}}""")
+    meta => vSwitch(vModel := meta.accessorName, attr("label") := meta.fieldName.capitalize).render,
+    meta => vIcon(vBind("color") := s"""${meta.accessorName}? "green": "red" """)(
+      s"""{{ ${
+        meta
+          .accessorName
+      } ? "check_circle" : "cancel"}}"""
+    )
       .render,
-    implicit n => parseField()
+    meta => parseField(meta)
   )
 
   implicit def optionFTV[T](implicit fieldView: FieldTypeView[T]): FieldTypeView[Option[T]] =
@@ -112,16 +153,16 @@ trait FieldTypeViewInstances {
 
     FieldTypeView.instance(
       defaultValue,
-      implicit n => {
+      meta => {
         vSelect(
-          vModel := editedItem,
+          vModel := meta.accessorName,
           attr("label") := enumName,
           attr("solo"),
           vBind("items") := enumValues
         ).render
       },
-      implicit n => tag("v-chip")(`class` := "primary", attr("text-color") := "white")(s"{{ $viewItem }}").render,
-      implicit n => parseField()
+      meta => tag("v-chip")(`class` := "primary", attr("text-color") := "white")(s"{{ ${meta.accessorName} }}").render,
+      meta => parseField(meta)
     )
   }
 

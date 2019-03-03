@@ -26,9 +26,9 @@ abstract class EntityActions
 
   type EntityTable <: JP#Table[Entity] with Identified
 
-  def tableQuery: TableQuery[EntityTable]
+  def query: TableQuery[EntityTable]
 
-  override def count: DBIO[Int] = tableQuery.size.result
+  override def count: DBIO[Int] = query.size.result
 
   override def findById(id: Id): DBIO[Entity] =
     filterById(id).result.head
@@ -61,14 +61,14 @@ abstract class EntityActions
 
   override def insert(entity: Entity)(implicit exc: ExecutionContext): DBIO[Id] = {
     val action = beforeInsert(entity).flatMap { preparedModel =>
-      tableQuery.returning(tableQuery.map(_.id)) += preparedModel
+      query.returning(query.map(_.id)) += preparedModel
     }
     // beforeInsert and '+=' must run on same tx
     action.transactionally
   }
 
   override def fetchAll(fetchSize: Int = 100)(implicit exc: ExecutionContext): StreamingDBIO[Seq[Entity], Entity] = {
-    tableQuery
+    query
       .result
       .transactionally
       .withStatementParameters(fetchSize = fetchSize)
@@ -110,7 +110,7 @@ abstract class EntityActions
   }
 
   def deleteByIds(ids: Set[Id])(implicit exc: ExecutionContext): DBIO[Int] = {
-    tableQuery.filter(_.id inSet ids).delete
+    query.filter(_.id inSet ids).delete
   }
 
   private def tryExtractId(entity: Entity): DBIO[Id] = {
@@ -120,7 +120,7 @@ abstract class EntityActions
     }
   }
 
-  private def filterById(id: Id) = tableQuery.filter(_.id === id)
+  private def filterById(id: Id) = query.filter(_.id === id)
 
   //Helper class that provides needed entities
   class IdData(val idLens: Lens[Entity, Option[Id]], val typed: BaseTypedType[Id])
