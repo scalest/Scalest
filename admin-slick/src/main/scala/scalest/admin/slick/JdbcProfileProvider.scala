@@ -22,7 +22,6 @@ object JdbcProfileProvider {
     override val jdbcProfile: PostgresProfile = PostgresProfile
   }
 
-
   trait DerbyProfileProvider
     extends JdbcProfileProvider {
     override type JP = DerbyProfile
@@ -46,5 +45,4 @@ object JdbcProfileProvider {
     override type JP = SQLiteProfile
     override val jdbcProfile: SQLiteProfile = SQLiteProfile
   }
-
 }

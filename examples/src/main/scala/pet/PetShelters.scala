@@ -17,7 +17,7 @@ object PetShelters
 
   override val idData = IdData(_.id, _.copy(_))
 
-  val petShelters, tableQuery = TableQuery[PetShelterTable]
+  val petShelters, query = TableQuery[PetShelterTable]
 
   class PetShelterTable(tag: Tag)
     extends Table[PetShelter](tag, "pet_shelters") with Identified {

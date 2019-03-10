@@ -1,7 +1,6 @@
 package pet
 
 import akka.actor.ActorSystem
-import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import distage._
 import scalest.ScalestApp
 import scalest.admin.{AdminExtension, ModelAdmin}
@@ -39,9 +38,7 @@ object PetApp
   )*/
 
   //Automatic modelView generation all can be customized using annotations
-  val adminExtension = new AdminExtension(ModelAdmin(petRepository))
-
-  override val routes = adminExtension.route
+  override val routes = new AdminExtension(ModelAdmin(petRepository)).route
 
   startServer()
 }

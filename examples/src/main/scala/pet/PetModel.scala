@@ -33,6 +33,8 @@ object PetModel
                  id: Option[Int] = None,
                  name: String,
                  adopted: Boolean,
+                 tags: Seq[String],
+                 bodySize: Byte,
                  sex: Sexes.Value)
 
   object Pet {

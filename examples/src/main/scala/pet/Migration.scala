@@ -1,7 +1,8 @@
 package pet
 
+import java.util.UUID
+
 import pet.PetModel.{Pet, Sexes}
-import pet.Pets._
 import slick.basic.DatabaseConfig
 import slick.jdbc.H2Profile
 
@@ -16,13 +17,10 @@ class Migration(dc: DatabaseConfig[H2Profile]) {
     Await.ready(
       dc.db.run(
         DBIO.seq(
-          pets.schema.createIfNotExists,
-          pets ++= Seq(
-            Pet(name = "Garfield", adopted = true, sex = Sexes.Male), Pet(
-              name = "Momo",
-              adopted = false,
-              sex = Sexes.Female
-            )
+          Pets.query.schema.createIfNotExists,
+          Pets.query ++= Seq(
+            Pet(name = "Garfield", adopted = true, sex = Sexes.Male, bodySize = 24, tags = Seq("pet", "lazy", "fat", "cat")),
+            Pet(name = "Momo", adopted = false, sex = Sexes.Female, tags = Seq.fill(15)(UUID.randomUUID().toString), bodySize = 60)
           )
         )
       ), Duration.Inf

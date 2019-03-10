@@ -13,7 +13,8 @@ class AdminExtension(modelAdmins: ModelAdmin[_, _]*)
   val noCorsHeaders: immutable.Seq[HttpHeader] = immutable.Seq(
     RawHeader("Access-Control-Allow-Origin", "*"),
     RawHeader("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE"),
-    RawHeader("Access-Control-Allow-Headers", "Content-Type"))
+    RawHeader("Access-Control-Allow-Headers", "Content-Type")
+  )
 
   val header: String = generateHeader(modelAdmins)
 
@@ -33,7 +34,7 @@ class AdminExtension(modelAdmins: ModelAdmin[_, _]*)
     pathPrefix("api") {
       modelAdmins.map(_.route).reduce(_ ~ _)
     }
-  } ~ pathPrefix("images")(getFromResourceDirectory("images"))
+  } ~ pathPrefix("static")(getFromResourceDirectory("static"))
 
   def completeHtml(html: String): StandardRoute = {
     complete(
