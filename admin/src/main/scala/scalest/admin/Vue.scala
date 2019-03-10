@@ -12,6 +12,8 @@ object Vue {
 
   lazy val vColor = attr("color")
 
+  lazy val vImg = tag("v-img")
+
   lazy val vToolbarSideIcon = tag("v-toolbar-side-icon")
 
   lazy val vMenu = tag("v-menu")

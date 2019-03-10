@@ -10,7 +10,7 @@ import scala.concurrent.Future
 
 class PetRepository(system: ActorSystem,
                     dc: DatabaseConfig[H2Profile])
-  extends CrudRepository[Pet] {
+  extends CrudRepository[Pet, Int] {
 
   import dc.profile.api._
   import system._
@@ -21,9 +21,7 @@ class PetRepository(system: ActorSystem,
 
   def create(pet: Pet): Future[Int] = execute(Pets.insert(pet))
 
-  def upsert(pet: Pet): Future[Pet] = execute(Pets.update(pet))
+  def update(pet: Pet): Future[Pet] = execute(Pets.update(pet))
 
-  def delete(id: Int): Future[Int] = execute(Pets.deleteById(id))
-
-  def deleteAll(ids: Seq[Int]): Future[Int] = execute(Pets.deleteByIds(ids.toSet))
+  def delete(ids: Seq[Int]): Future[Int] = execute(Pets.deleteByIds(ids.toSet))
 }

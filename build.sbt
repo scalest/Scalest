@@ -12,8 +12,7 @@ lazy val core = Project("scalest-core", file("./core"))
       "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
       "de.heikoseeberger" %% "akka-http-circe" % "1.25.2",
       "com.github.pshirshov.izumi.r2" %% "distage-core" % izumiVersion,
-      "com.github.pshirshov.izumi.r2" %% "distage-config" % izumiVersion,
-      "ch.megard" %% "akka-http-cors" % "0.3.4"
+      "com.github.pshirshov.izumi.r2" %% "distage-config" % izumiVersion
     )
   }
 

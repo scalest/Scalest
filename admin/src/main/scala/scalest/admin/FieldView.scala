@@ -196,11 +196,11 @@ trait FieldTypeViewInstances {
     meta => parseField(meta)
   )
 
-  implicit def listFTV[T](implicit elementFTV: FieldTypeView[T]): FieldTypeView[Seq[T]] = seqFTV[T].copy
+  implicit def listFTV[T](implicit elementFTV: FieldTypeView[T]): FieldTypeView[List[T]] = seqFTV[T].copy
 
-  implicit def setFTV[T](implicit elementFTV: FieldTypeView[T]): FieldTypeView[Seq[T]] = seqFTV[T].copy
+  implicit def setFTV[T](implicit elementFTV: FieldTypeView[T]): FieldTypeView[Set[T]] = seqFTV[T].copy
 
-  implicit def arrayFTV[T](implicit elementFTV: FieldTypeView[T]): FieldTypeView[Seq[T]] = seqFTV[T].copy
+  implicit def arrayFTV[T](implicit elementFTV: FieldTypeView[T]): FieldTypeView[Array[T]] = seqFTV[T].copy
 
   //This maybe should do something -__-
   implicit def optionFTV[T](implicit fieldView: FieldTypeView[T]): FieldTypeView[Option[T]] =
