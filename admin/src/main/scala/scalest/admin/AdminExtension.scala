@@ -24,6 +24,6 @@ class AdminExtension(modelAdmins: ModelAdmin[_]*)
     }.reduce(_ ~ _)
   } ~ pathPrefix("api") {
     modelAdmins.map(_.route).reduce(_ ~ _)
-  }
+  } ~ pathPrefix("static")(getFromResourceDirectory("static"))
   //Todo: Create auth for admin panel
 }

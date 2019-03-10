@@ -38,6 +38,8 @@ trait ModelAdminScript {
       s"""
         Vue.config.devtools = true;
 
+        Vue.component('virtual-list', VirtualScrollList);
+
         var SnackbarNotificationQueue = {
           data: {
             notificationText: "",
@@ -80,14 +82,10 @@ trait ModelAdminScript {
                 { text: "Actions", value: "id", sortable: false }
               ],
               models: [],
-              // autoKey: true,
               editedIndex: -1,
-              // Both generated
+              // Generated
               editedItem: {${renderDefaults()}},
-              defaultItem: {
-                id: 0,
-                name: ""
-              }
+              defaultItem: {${renderDefaults()}}
             };
           },
           watch: {
@@ -118,10 +116,9 @@ trait ModelAdminScript {
             },
             editItem(item) {
               this.editedIndex = this.models.indexOf(item);
-              this.editedItem = Object.assign({}, item);
+              this.editedItem = JSON.parse(JSON.stringify(item));
               this.dialog = true;
             },
-
             deleteItem(item) {
               const index = this.models.indexOf(item);
               if (confirm("Are you sure you want to delete this item?")) {
@@ -134,7 +131,6 @@ trait ModelAdminScript {
                   .catch(error => this.addNotification("Can`t delete item"));
               }
             },
-
             close() {
               this.dialog = false;
               setTimeout(() => {
@@ -142,7 +138,6 @@ trait ModelAdminScript {
                 this.editedIndex = -1;
               }, 300);
             },
-
             save() {
               const json = {${renderFormParse()}}
 

@@ -84,31 +84,17 @@ trait FieldTypeViewInstances {
     s"""${meta.fieldName}: ${parser(meta.accessorName)}"""
 
 
+  //Todo: Map, Json, Markdown, components
+  //Todo: Validation
+
   implicit val intFTV: FieldTypeView[Int] = FieldTypeView.instance(
     "0",
-    meta => vTextField(vModel := meta.accessorName, `type` := "number", attr("label") := meta.fieldName.capitalize).render,
+    meta => vTextField(vModel := meta.accessorName, attr("solo"), `type` := "number", attr("label") := meta.fieldName.capitalize).render,
     meta => s"{{ ${meta.accessorName} }}",
     meta => parseField(meta, item => s"parseInt($item)")
   )
 
-
-  implicit def seqFTV[T](implicit elementFTV: FieldTypeView[T]): FieldTypeView[Seq[T]] = FieldTypeView.instance(
-    default = "[]",
-    meta => "",
-    meta => vMenu(attr("offset-y"))(
-      vToolbarTitle(attr("slot") := "activator")(
-        span(meta.fieldName.capitalize),
-        vIcon("arrow_drop_down")
-      ),
-      vList(
-        vListTile(vFor := "(item, index) in items", vBind("key") := "index")(
-          elementFTV.toOutput(FieldMeta("index", "item"))
-        )
-      )
-    ).render,
-    meta => parseField(meta)
-  )
-
+  //Should get correct validation
   implicit val shortFTV: FieldTypeView[Short] = intFTV.copy
 
   implicit val longFTV: FieldTypeView[Char] = intFTV.copy
@@ -117,9 +103,17 @@ trait FieldTypeViewInstances {
 
   implicit val charFTV: FieldTypeView[Char] = intFTV.copy
 
+  implicit val floatFTV: FieldTypeView[Float] = intFTV.copy
+
+  implicit val doubleFTV: FieldTypeView[Double] = intFTV.copy
+
+  implicit val bigDecimalFTV: FieldTypeView[BigDecimal] = intFTV.copy
+
+  implicit val bigIntFTV: FieldTypeView[BigInt] = intFTV.copy
+
   implicit val strFTV: FieldTypeView[String] = FieldTypeView.instance(
     "\"\"",
-    meta => vTextField(vModel := meta.accessorName, attr("label") := meta.fieldName.capitalize).render,
+    meta => vTextField(vModel := meta.accessorName, attr("solo"), attr("label") := meta.fieldName.capitalize).render,
     meta => s"{{ ${meta.accessorName} }}",
     meta => parseField(meta)
   )
@@ -137,6 +131,78 @@ trait FieldTypeViewInstances {
     meta => parseField(meta)
   )
 
+  implicit def seqFTV[T](implicit elementFTV: FieldTypeView[T]): FieldTypeView[Seq[T]] = FieldTypeView.instance(
+    default = "[]",
+    meta => vCard(`class` := "mb-4")(
+      vCardTitle(
+        span(`class` := "headline")(meta.fieldName),
+        vSpacer,
+        vBtn(`@click` := s"${meta.accessorName}.unshift(${elementFTV.defaultValue()})", attr("color") := "blue", `class` := "white--text")(
+          "Create"
+        )
+      ),
+      vCardText(
+        vList(
+          vTemplate(vIf := s"${meta.accessorName}.length <= 10", vFor := s"(item, index) in ${meta.accessorName}")(
+            vListTile(vBind("key") := "index", `class` := "py-1")(
+              tag("v-list-tile-content")(style := "overflow: inherit; display: unset;")(
+                raw(elementFTV.toInput(FieldMeta("", s"${meta.accessorName}[index]")))
+              ),
+              tag("v-list-tile-action")(
+                vBtn(attr("icon"), attr("flat"), attr("color") := "red lighten-3", `@click` := s"${meta.accessorName}.splice(index, 1)")(
+                  vIcon("close")
+                )
+              )
+            )
+          ),
+          tag("virtual-list")(vIf := s"${meta.accessorName}.length > 10", vBind("size") := "40", vBind("remain") := "10")(
+            vTemplate(vFor := s"(item, index) in ${meta.accessorName}")(
+              vListTile(`class` := "item py-1", vBind("key") := "index")(
+                tag("v-list-tile-content")(style := "overflow: inherit; display: unset;")(
+                  raw(elementFTV.toInput(FieldMeta("", s"${meta.accessorName}[index]")))
+                ),
+                tag("v-list-tile-action")(
+                  vBtn(attr("icon"), attr("flat"), attr("color") := "red lighten-3", `@click` := s"${meta.accessorName}.splice(index, 1)")(
+                    vIcon("close")
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    ).render,
+    meta => vMenu(attr("offset-y"))(
+      vToolbarTitle(attr("slot") := "activator")(
+        vBtn(attr("dark"), attr("color") := "indigo", attr("fab"), attr("small"))(
+          vIcon(attr("dark"))("visibility")
+        )
+      ),
+      vList(
+        vTemplate(vIf := s"${meta.accessorName}.length <= 10", vFor := s"(item, index) in ${meta.accessorName}")(
+          vListTile(vBind("key") := "index")(
+            elementFTV.toOutput(FieldMeta("index", "item"))
+          )
+        ),
+        tag("virtual-list")(vIf := s"${meta.accessorName}.length > 10", vBind("size") := "40", vBind("remain") := "10")(
+          vTemplate(vFor := s"(item, index) in ${meta.accessorName}")(
+            vListTile(`class` := "item", vBind("key") := "index")(
+              elementFTV.toOutput(FieldMeta("index", "item"))
+            )
+          )
+        )
+      )
+    ).render,
+    meta => parseField(meta)
+  )
+
+  implicit def listFTV[T](implicit elementFTV: FieldTypeView[T]): FieldTypeView[Seq[T]] = seqFTV[T].copy
+
+  implicit def setFTV[T](implicit elementFTV: FieldTypeView[T]): FieldTypeView[Seq[T]] = seqFTV[T].copy
+
+  implicit def arrayFTV[T](implicit elementFTV: FieldTypeView[T]): FieldTypeView[Seq[T]] = seqFTV[T].copy
+
+  //This maybe should do something -__-
   implicit def optionFTV[T](implicit fieldView: FieldTypeView[T]): FieldTypeView[Option[T]] =
     FieldTypeView.instance(
       fieldView.defaultValue(),
@@ -165,6 +231,4 @@ trait FieldTypeViewInstances {
       meta => parseField(meta)
     )
   }
-
-  //Todo: capture all core Field types
 }

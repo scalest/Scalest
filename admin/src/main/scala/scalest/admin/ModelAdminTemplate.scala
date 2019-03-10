@@ -3,6 +3,7 @@ package scalest.admin
 import scalatags.Text.all._
 import scalest.admin.Vue._
 
+//Todo: rework whole stuff to some plain css and Vue, so i can drop vuetify,
 trait ModelAdminTemplate {
   type Header = String
   type Template = String
@@ -82,7 +83,7 @@ trait ModelAdminTemplate {
             vCardText(
               vContainer(attr("grid-list-md"))(
                 vLayout(attr("wrap"))(
-                  vFlex(attr("xs12"), attr("sm12"), attr("md12"))(
+                  vFlex(attr("xs12"))(
                     modelRepr.map(_.toInput())
                   )
                 )
@@ -118,11 +119,12 @@ trait ModelAdminTemplate {
       script(src := "https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"),
       script(src := "https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"),
       script(src := "https://cdn.jsdelivr.net/npm/vuelidate@0.7.4/dist/vuelidate.min.js"),
+      script(src := "/static/js/vue-virtual-scroll-list.js")
       //Todo: Use tui for markdown textfields
       //script(src := "https://cdnjs.cloudflare.com/ajax/libs/tui-editor/1.3.0/tui-editor-Editor.min.js"),
       //Todo: Use jsoneditor for json fields
       //script(src := "https://cdn.jsdelivr.net/npm/@json-editor/json-editor@latest/dist/jsoneditor.min.js")
-      )
+    )
   }
 
   private def headImports() = {
@@ -130,13 +132,11 @@ trait ModelAdminTemplate {
       link(
         href := "https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons",
         rel := "stylesheet"
-      )
-      ,
+      ),
       link(
         href := "https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css",
         rel := "stylesheet"
-      )
-      ,
+      ),
       meta(
         name := "viewport",
         content := "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
