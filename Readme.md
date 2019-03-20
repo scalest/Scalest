@@ -3,12 +3,12 @@
 
 ## Description
 
-Scalest is set of helpful features for Akka.
-First and the main of them is Admin panel which is aggregator of all other features.
-In future there will be healthchecks, more CMS-like features, swagger and cors stuff and far more.
-The main thing Scalest makes is easier - faster creation of any type of application.
-For instance such admin panel can be very helpful for developing chatbots,
-as tool for support team or for developer himself.
+Scalest is a set of helpful features for Akka.
+The main one of them is the admin panel which is an aggregator of all other features.
+In future there will be healthchecks, more CMS-like features, swagger, cors stuff and much more.
+The main thing Scalest makes easier is fast creation of any type of application.
+For example the admin panel can be very helpful for developing chatbots,
+as a tool for the support team or for the developer themself.
 
 To start using Scalest add this to `build.sbt`:
 
