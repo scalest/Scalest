@@ -8,7 +8,7 @@ The main one of them is the admin panel which is an aggregator of all other feat
 In future there will be healthchecks, more CMS-like features, swagger, cors stuff and much more.
 The main thing Scalest makes easier is fast creation of any type of application.
 For example the admin panel can be very helpful for developing chatbots,
-as a tool for the support team or for the developer themself.
+as a tool for the support team or for the developers themselves.
 
 To start using Scalest add this to `build.sbt`:
 
