@@ -1,20 +1,20 @@
-import scala.io.StdIn
-
 val username = sys.env.get("SONATYPE_USERNAME")
   .orElse(Option(System.getProperty("SONATYPE_USERNAME")))
-  .getOrElse(StdIn.readLine("Enter SONATYPE_USERNAME: "))
 
 val password = sys.env
   .get("SONATYPE_PASSWORD")
   .orElse(Option(System.getProperty("SONATYPE_PASSWORD")))
-  .getOrElse(StdIn.readLine("Enter SONATYPE_PASSWORD: "))
 
-credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", username, password)
+credentials ++= (for {
+  u <- username
+  p <- password
+} yield Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", u, p)).toSeq
+
 
 sonatypeProfileName := "io.github.0lejk4"
 
 publishMavenStyle := true
-pgpPassphrase := Some(password.toCharArray)
+pgpPassphrase := password.map(_.toCharArray)
 licenses := Seq(
   "APL2" -> url("https://github.com/0lejk4/Scalest/blob/master/LICENSE")
 )
