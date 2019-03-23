@@ -3,7 +3,6 @@ package scalest.admin
 import scalatags.Text.all._
 import scalest.admin.Vue.{vCardTitle, _}
 
-//Todo: rework whole stuff to some plain css and Vue, so i can drop vuetify,
 trait ModelAdminTemplate {
   type Header = String
   type Template = String
@@ -158,9 +157,7 @@ trait ModelAdminTemplate {
       script(src := "https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"),
       script(src := "https://cdn.jsdelivr.net/npm/vuelidate@0.7.4/dist/vuelidate.min.js"),
       script(src := "/static/js/vue-virtual-scroll-list.js")
-      //Todo: Use tui for markdown textfields
       //script(src := "https://cdnjs.cloudflare.com/ajax/libs/tui-editor/1.3.0/tui-editor-Editor.min.js"),
-      //Todo: Use jsoneditor for json fields
       //script(src := "https://cdn.jsdelivr.net/npm/@json-editor/json-editor@latest/dist/jsoneditor.min.js")
     )
   }

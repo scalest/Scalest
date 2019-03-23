@@ -243,7 +243,6 @@
             },
 
             // return the variable paddingTop base current zone.
-            // @todo: if set a large `start` before variable was calculated,
             // here will also case too much offset calculate when list is very large,
             // consider use estimate paddingTop in this case just like `getVarPaddingBottom`.
             getVarPaddingTop: function () {

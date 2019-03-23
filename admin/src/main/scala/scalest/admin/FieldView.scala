@@ -83,10 +83,6 @@ trait FieldTypeViewInstances {
   def parseField(meta: FieldMeta, parser: String => String = n => n) =
     s"""${meta.fieldName}: ${parser(meta.accessorName)}"""
 
-
-  //Todo: Map, Json, Markdown, components
-  //Todo: Validation
-
   implicit val intFTV: FieldTypeView[Int] = FieldTypeView.instance(
     "0",
     meta => vTextField(vModel := meta.accessorName, attr("solo"), `type` := "number", attr("label") := meta.fieldName.capitalize).render,
@@ -94,7 +90,6 @@ trait FieldTypeViewInstances {
     meta => parseField(meta, item => s"parseInt($item)")
   )
 
-  //Should get correct validation
   implicit val shortFTV: FieldTypeView[Short] = intFTV.copy
 
   implicit val longFTV: FieldTypeView[Char] = intFTV.copy

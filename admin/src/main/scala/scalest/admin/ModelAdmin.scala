@@ -4,7 +4,6 @@ import akka.http.scaladsl.server.{Directives, Route}
 import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport
 import io.circe.{Decoder, Encoder}
 
-//Todo: Entities relations
 class ModelAdmin[Model: Encoder : Decoder, Id: Encoder : Decoder](val crudRepository: CrudRepository[Model, Id],
                                                                   val modelView: ModelView[Model])
 
@@ -14,11 +13,6 @@ class ModelAdmin[Model: Encoder : Decoder, Id: Encoder : Decoder](val crudReposi
 
   val script: String = generateScript(this)
 
-  //Todo: Server-Side Pagination operation
-  //Todo: Search operation
-  //Todo: Custom Actions endpoint operation
-  //Todo: Delete Selected operation
-  //Todo: Entity Validation using annotations
   val route: Route = pathPrefix(s"${modelView.modelName}s") {
     (get & pathEndOrSingleSlash) {
       complete(crudRepository.findAll())

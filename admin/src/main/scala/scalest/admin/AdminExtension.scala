@@ -44,6 +44,4 @@ class AdminExtension(modelAdmins: ModelAdmin[_, _]*)
       )
     )
   }
-
-  //Todo: Create auth for admin panel
 }

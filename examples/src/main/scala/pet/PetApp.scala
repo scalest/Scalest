@@ -45,4 +45,5 @@ object PetApp
       FieldView("tags", seqFTV[Sex]),
       FieldView("bodySize", byteFTV)
     )
-  )*/
+  )
+*/

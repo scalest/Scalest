@@ -7,7 +7,6 @@ trait ModelAdminScript {
 
   def generateScript(ma: ModelAdmin[_, _]): Script = script(adminVueScript(ma.modelView)).render
 
-  //Todo: Entity Validation using annotations
   private def adminVueScript(mv: ModelView[_]) = {
     import mv._
 
