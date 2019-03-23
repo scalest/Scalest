@@ -12,7 +12,7 @@ object PetShelters
   import jdbcProfile.api._
 
   type Id = Int
-  type Entity = PetShelter
+  type Model = PetShelter
   type EntityTable = PetShelterTable
 
   override val idData = IdData(_.id, _.copy(_))

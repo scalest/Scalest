@@ -26,7 +26,7 @@ object PetModel
     val Male = Value("MALE")
     val Female = Value("FEMALE")
 
-    implicit val ed: `E&D`[Sexes.Value] = circeEnum(this)
+    implicit val ed = circeEnum(Sexes)
   }
 
   case class Pet(@NoWrite
