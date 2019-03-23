@@ -111,7 +111,7 @@ trait ModelAdminScript {
             },
             initialize() {
               axios
-                .get("http://localhost:9000/api/${modelName}s")
+                .get("/api/${modelName}s")
                 .then(r => (this.models = r.data));
             },
             editItem(item) {

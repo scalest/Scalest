@@ -5,9 +5,9 @@ import scala.concurrent.Future
 trait CrudRepository[Model, Id] {
   def findAll(): Future[Seq[Model]]
 
-  def create(m: Model): Future[Int]
+  def create(m: Model): Future[Id]
 
   def update(m: Model): Future[Model]
 
-  def delete(ids: Seq[Id]): Future[Int]
+  def delete(ids: Set[Id]): Future[Int]
 }

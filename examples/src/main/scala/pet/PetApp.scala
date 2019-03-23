@@ -3,13 +3,13 @@ package pet
 import akka.actor.ActorSystem
 import distage._
 import scalest.ScalestApp
-import scalest.admin.{AdminExtension, ModelAdmin}
+import scalest.admin.slick.SlickModelAdmin
+import scalest.admin.AdminExtension
 import slick.basic.DatabaseConfig
 import slick.jdbc.H2Profile
 
 object PetModule
   extends ModuleDef {
-  make[PetRepository]
   make[DatabaseConfig[H2Profile]].from { system: ActorSystem =>
     DatabaseConfig.forConfig[H2Profile]("slick", system.settings.config)
   }
@@ -19,11 +19,19 @@ object PetModule
 object PetApp
   extends ScalestApp("PetApp", List(PetModule)) with App {
 
-  locator.get[Migration].migrate()
+  import system.dispatcher
 
-  val petRepository: PetRepository = locator.get[PetRepository]
+  implicit val dbConfig: DatabaseConfig[H2Profile] = locator.get[DatabaseConfig[H2Profile]]
+  val migration: Migration = locator.get[Migration]
 
-  /*//Manual modelView creation
+  migration.migrate()
+
+  override val routes = new AdminExtension(SlickModelAdmin(Pets)).route
+
+  startServer()
+}
+
+/* You could also create ModelView manually like this:
   import scalest.admin._
 
   implicit val modelView = ModelView[Pet](
@@ -33,12 +41,8 @@ object PetApp
       FieldView("id", intFTV, writeable = false),
       FieldView("name", strFTV),
       FieldView("adopted", boolFTV),
-      FieldView("sex", enumFTV[Sex])
+      FieldView("sex", enumFTV[Sex]),
+      FieldView("tags", seqFTV[Sex]),
+      FieldView("bodySize", byteFTV)
     )
   )*/
-
-  //Automatic modelView generation all can be customized using annotations
-  override val routes = new AdminExtension(ModelAdmin(petRepository)).route
-
-  startServer()
-}

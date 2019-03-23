@@ -30,7 +30,7 @@ class ModelAdmin[Model: Encoder : Decoder, Id: Encoder : Decoder](val crudReposi
         entity(as[Model])(m => complete(crudRepository.update(m)))
       } ~
       (delete & pathEndOrSingleSlash) {
-        entity(as[Seq[Id]])(ids => complete(crudRepository.delete(ids)))
+        entity(as[Set[Id]])(ids => complete(crudRepository.delete(ids)))
       }
   }
 }
