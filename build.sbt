@@ -7,7 +7,7 @@ val scala2_12Version = "2.12.8"
 
 lazy val snapshot: Boolean = true
 lazy val v: String = {
-  val vv = "0.0.0"
+  val vv = "0.0.1"
   if (!snapshot) vv
   else vv + "-SNAPSHOT"
 }
@@ -39,7 +39,7 @@ def sonatypeProject(id: String, base: File) =
             <url>https://github.com/0lejk4/</url>
           </developer>
         </developers>
-    )
+      )
 
 lazy val core = sonatypeProject("scalest-core", file("./core"))
   .settings {
@@ -51,7 +51,7 @@ lazy val core = sonatypeProject("scalest-core", file("./core"))
       "de.heikoseeberger" %% "akka-http-circe" % "1.25.2",
       "com.github.pshirshov.izumi.r2" %% "distage-core" % izumiVersion,
       "com.github.pshirshov.izumi.r2" %% "distage-config" % izumiVersion
-    )
+      )
   }
 
 lazy val admin = sonatypeProject("scalest-admin", file("./admin"))
@@ -60,9 +60,10 @@ lazy val admin = sonatypeProject("scalest-admin", file("./admin"))
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
       "de.heikoseeberger" %% "akka-http-circe" % "1.25.2",
+      "io.circe" %% "circe-generic" % "0.11.1",
       "com.lihaoyi" %% "scalatags" % "0.6.7",
       "com.propensive" %% "magnolia" % "0.10.0"
-    )
+      )
   }
 
 lazy val adminSlick = sonatypeProject("scalest-admin-slick", file("./admin-slick"))
@@ -72,14 +73,14 @@ lazy val adminSlick = sonatypeProject("scalest-admin-slick", file("./admin-slick
     libraryDependencies ++= Seq(
       "com.typesafe.slick" %% "slick" % slickVersion,
       "com.typesafe.slick" %% "slick-hikaricp" % slickVersion
-    )
+      )
   }
 
 lazy val examples = Project("scalest-examples", file("./examples"))
   .dependsOn(
     adminSlick,
     core
-  )
+    )
   .settings {
     skip in publish := true
     publish := {}
@@ -87,7 +88,7 @@ lazy val examples = Project("scalest-examples", file("./examples"))
     libraryDependencies ++= Seq(
       "com.h2database" % "h2" % "1.4.197",
       "io.circe" %% "circe-parser" % circeVersion
-    )
+      )
   }
 
 lazy val root = Project(id = "scalest", base = file("."))
@@ -96,7 +97,7 @@ lazy val root = Project(id = "scalest", base = file("."))
     admin,
     adminSlick,
     examples
-  )
+    )
   .settings {
     name := "scalest"
     version := v

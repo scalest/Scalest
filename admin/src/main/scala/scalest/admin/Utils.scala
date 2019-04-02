@@ -1,6 +1,5 @@
 package scalest.admin
 
-import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 
 object Utils {
@@ -15,14 +14,6 @@ object Utils {
         val moduleSymbol = enumType.termSymbol.asModule
         mirror.reflectModule(moduleSymbol).instance.asInstanceOf[Enumeration]
     }
-  }
-
-  implicit class SeqOps(val annos: Seq[Any])
-    extends AnyVal {
-    def findOfType[T: ClassTag]: Option[T] = annos.find {
-      case _: T => true
-      case _ => false
-    }.map(_.asInstanceOf[T])
   }
 
 }

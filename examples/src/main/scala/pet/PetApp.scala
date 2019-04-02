@@ -13,20 +13,20 @@ object PetModule
   make[DatabaseConfig[H2Profile]].from { system: ActorSystem =>
     DatabaseConfig.forConfig[H2Profile]("slick", system.settings.config)
   }
-  make[Migration]
+  make[Migrator]
 }
 
-object PetApp
-  extends ScalestApp("PetApp", List(PetModule)) with App {
+object PetApp extends ScalestApp("PetApp", List(PetModule)) with App {
 
   import system.dispatcher
 
   implicit val dbConfig: DatabaseConfig[H2Profile] = locator.get[DatabaseConfig[H2Profile]]
-  val migration: Migration = locator.get[Migration]
 
-  migration.migrate()
+  val migrator: Migrator = locator.get[Migrator]
 
-  override val routes = new AdminExtension(SlickModelAdmin(Pets)).route
+  migrator.migrate()
+
+  override val routes = AdminExtension(SlickModelAdmin(Pets), SlickModelAdmin(Users)).route
 
   startServer()
 }

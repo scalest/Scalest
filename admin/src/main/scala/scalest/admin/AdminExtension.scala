@@ -1,47 +1,52 @@
 package scalest.admin
 
-import akka.http.scaladsl.model.headers.RawHeader
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpHeader}
-import akka.http.scaladsl.server.{Directives, Route, StandardRoute}
-import scalest.admin.ModelAdminTemplate._
+import akka.http.scaladsl.server.Route
+import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport
 
-import scala.collection.immutable
+class AdminExtension(modelAdmins: Seq[ModelAdmin[_, _]]) extends AuthDirectives with CorsDirectives with ErrorAccumulatingCirceSupport {
 
-class AdminExtension(modelAdmins: ModelAdmin[_, _]*)
-  extends Directives {
+  val modelAdminSchemas: Seq[ModelSchema[_]] = modelAdmins.map(_.modelSchema)
 
-  val noCorsHeaders: immutable.Seq[HttpHeader] = immutable.Seq(
-    RawHeader("Access-Control-Allow-Origin", "*"),
-    RawHeader("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE"),
-    RawHeader("Access-Control-Allow-Headers", "Content-Type")
-  )
-
-  val header: String = generateHeader(modelAdmins)
-
-  val mainPageHtml: String = generateMainPageHtml(header)
-
-  val modelAdminRoutes: Route = modelAdmins.map { ma =>
-    val html = generateSingleModelHtml(header, ma)
-
-    pathPrefix(ma.modelView.modelName) {
-      completeHtml(html)
-    }
-  }.reduce(_ ~ _)
-
-  val route: Route = pathPrefix("admin") {
-    pathEndOrSingleSlash(completeHtml(mainPageHtml)) ~ modelAdminRoutes
-  } ~ respondWithHeaders(noCorsHeaders) {
-    pathPrefix("api") {
-      modelAdmins.map(_.route).reduce(_ ~ _)
-    }
-  } ~ pathPrefix("static")(getFromResourceDirectory("static"))
-
-  def completeHtml(html: String): StandardRoute = {
-    complete(
-      HttpEntity(
-        ContentTypes.`text/html(UTF-8)`,
-        html
-      )
-    )
+  val route: Route = corsSupport {
+    staticRoute ~ adminRoute ~ apiRoute
   }
+
+  def adminRoute: Route = pathPrefix("admin") {
+    homeRoute ~ loginRoute ~ schemasRoute
+  }
+
+  private def homeRoute = {
+    pathEndOrSingleSlash {
+      getFromResource("vue/index.html")
+    }
+  }
+
+  private def schemasRoute =
+    auth {
+      pathPrefix("schemas") {
+        pathEndOrSingleSlash {
+          complete(modelAdminSchemas)
+        } ~ pathPrefix(Segment) { name =>
+          complete {
+            modelAdminSchemas.find(_.name == name).toRight(AppError("error.not-found"))
+          }
+        }
+      }
+    }
+
+  def apiRoute: Route =
+    auth {
+      pathPrefix("api") {
+        modelAdmins.map(_.route).reduce(_ ~ _)
+      }
+    }
+
+  def staticRoute: Route = pathPrefix("static") {
+    getFromResourceDirectory("static") ~ getFromResourceDirectory("vue/static")
+  } ~ pathPrefix("favicon.ico")(getFromResource("vue/favicon.ico"))
+
+}
+
+object AdminExtension {
+  def apply(modelAdmins: ModelAdmin[_, _]*): AdminExtension = new AdminExtension(modelAdmins)
 }
