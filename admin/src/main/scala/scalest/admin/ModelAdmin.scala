@@ -4,16 +4,10 @@ import akka.http.scaladsl.server.{Directives, Route}
 import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport
 import io.circe.{Decoder, Encoder}
 
-class ModelAdmin[Model: Encoder : Decoder, Id: Encoder : Decoder](val crudRepository: CrudRepository[Model, Id],
-                                                                  val modelView: ModelView[Model])
+class ModelAdmin[Model: Encoder : Decoder, Id: Encoder : Decoder](val crudRepository: CrudRepository[Model, Id], val modelSchema: ModelSchema[Model])
+  extends Directives with ErrorAccumulatingCirceSupport {
 
-  extends Directives with ModelAdminTemplate with ModelAdminScript with ErrorAccumulatingCirceSupport {
-
-  val template: Template = generateTemplate(this)
-
-  val script: String = generateScript(this)
-
-  val route: Route = pathPrefix(s"${modelView.modelName}s") {
+  val route: Route = pathPrefix(s"${modelSchema.name}") {
     (get & pathEndOrSingleSlash) {
       complete(crudRepository.findAll())
     } ~
@@ -30,8 +24,7 @@ class ModelAdmin[Model: Encoder : Decoder, Id: Encoder : Decoder](val crudReposi
 }
 
 object ModelAdmin {
-  def apply[Model: Encoder : Decoder : ModelView, Id: Encoder : Decoder](crudRepository: CrudRepository[Model, Id]): ModelAdmin[Model, Id] = new ModelAdmin(
-    crudRepository = crudRepository,
-    modelView = implicitly
-  )
+  def apply[Model: Encoder : Decoder : ModelSchema, Id: Encoder : Decoder](crudRepository: CrudRepository[Model, Id]): ModelAdmin[Model, Id] = {
+    new ModelAdmin(crudRepository, modelSchema = implicitly)
+  }
 }

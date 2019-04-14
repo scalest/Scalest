@@ -9,29 +9,19 @@ import slick.jdbc.JdbcType
 import io.circe.syntax._
 import io.circe.parser._
 
-object Pets
-  extends EntityActions with H2ProfileProvider {
+object Pets extends SlickModel with H2ProfileProvider {
 
   import jdbcProfile.api._
 
   type Id = Int
   type Model = Pet
-  type EntityTable = PetsTable
+  type ModelTable = PetsTable
 
   override val idData = IdData(_.id, _.copy(_))
 
   val query = TableQuery[PetsTable]
 
-  implicit val sexEnumMapper: JdbcType[Sex] with BaseTypedType[Sex] = {
-    MappedColumnType.base[Sex, String](_.toString, Sexes.withName)
-  }
-
-  implicit val seqStringMapper: JdbcType[Seq[String]] with BaseTypedType[Seq[String]] = {
-    MappedColumnType.base[Seq[String], String](_.asJson.noSpaces, parse(_).right.get.as[Seq[String]].right.get)
-  }
-
-  class PetsTable(tag: Tag)
-    extends Table[Pet](tag, "pets") with Identified {
+  class PetsTable(tag: Tag) extends SlickModelTable(tag, "pets") {
 
     val id = column[Int]("id", O.AutoInc, O.PrimaryKey)
 
@@ -46,6 +36,14 @@ object Pets
     val sex = column[Sex]("sex")
 
     override def * = (id.?, name, adopted, tags, bodySize, sex).mapTo[Pet]
+  }
+
+  implicit val sexEnumMapper: JdbcType[Sex] with BaseTypedType[Sex] = {
+    MappedColumnType.base[Sex, String](_.toString, Sexes.withName)
+  }
+
+  implicit val seqStringMapper: JdbcType[Seq[String]] with BaseTypedType[Seq[String]] = {
+    MappedColumnType.base[Seq[String], String](_.asJson.noSpaces, parse(_).right.get.as[Seq[String]].right.get)
   }
 
 }

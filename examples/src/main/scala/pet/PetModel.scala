@@ -1,24 +1,9 @@
 package pet
 
-import scalest.admin.NoWrite
+import pet.PetModel.Sexes.Sex
 import scalest.json.{CirceJsonSupport, `E&D`}
 
-object PetModel
-  extends CirceJsonSupport {
-
-  case class Address(avenue: String, house: Int, floor: String, apartments: Int)
-
-  object Address {
-    implicit val ed: `E&D`[Address] = circeObject
-  }
-
-  case class PetShelter(id: Option[Int] = None, name: String, address: Address)
-
-  object PetShelter {
-    def tupled = (PetShelter.apply _).tupled
-
-    implicit val ed: `E&D`[PetShelter] = circeObject
-  }
+object PetModel extends CirceJsonSupport {
 
   object Sexes
     extends Enumeration {
@@ -29,18 +14,27 @@ object PetModel
     implicit val ed = circeEnum(Sexes)
   }
 
-  case class Pet(@NoWrite
-                 id: Option[Int] = None,
+  case class Pet(id: Option[Int] = None,
                  name: String,
                  adopted: Boolean,
                  tags: Seq[String],
                  bodySize: Byte,
-                 sex: Sexes.Value)
+                 sex: Sex)
 
   object Pet {
     def tupled = (Pet.apply _).tupled
 
     implicit val ed: `E&D`[Pet] = circeObject
+  }
+
+  case class User(id: Option[Int] = None,
+                  username: String,
+                  password: String)
+
+  object User {
+    def tupled = (User.apply _).tupled
+
+    implicit val ed: `E&D`[User] = circeObject
   }
 
 }
