@@ -14,7 +14,7 @@ To start using Scalest add this to `build.sbt`:
 
 ```scala
 resolvers += Resolver.sonatypeRepo("snapshots")
-lazy val scalestV: String = "0.0.0-SNAPSHOT"
+lazy val scalestV: String = "0.0.2-SNAPSHOT"
 libraryDependencies ++= {
   Seq(
     "io.github.0lejk4" %% "scalest-core" % scalestV, // core,
@@ -32,12 +32,17 @@ You only need to provide CRUD repository,
 for example like this:
 
 ```scala
-val routes = new AdminExtension(ModelAdmin(crudRepository)).route
+val routes = AdminExtension(ModelAdmin(crudRepository)).route
 ```
 
 You can find full example in [here](./examples/src/main/scala/pet/)
 if you run it you will see such admin panel:
 ![Models list](assets/admin_panel.png)
+
+## Contribution
+
+You can easily create Backend implementation for your language. 
+For more details contact me.
 
 ## Modules
 
@@ -45,3 +50,4 @@ if you run it you will see such admin panel:
 - *Admin* - admin panel module that creates UI for your entities
 - *Admin-Slick* - slick backend for Admin module
 - *Examples* - example applications using Scalest
+- *Admin-Vue* - Frontend implementation of Scalest Admin Panel
