@@ -7,7 +7,7 @@ val scala2_12Version = "2.12.8"
 
 lazy val snapshot: Boolean = true
 lazy val v: String = {
-  val vv = "0.0.1"
+  val vv = "0.0.2"
   if (!snapshot) vv
   else vv + "-SNAPSHOT"
 }
