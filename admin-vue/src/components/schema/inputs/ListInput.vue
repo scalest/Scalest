@@ -1,12 +1,11 @@
- 
 <template>
-  <div>{{item[field.name]}}</div>
+    <div>{{item[field.name]}}</div>
 </template>
 
 <script>
-export default {
-  name: "list-input",
-  props: { field: Object, item: Object }
-};
+  export default {
+    name: "list-input",
+    props: {field: Object, item: Object}
+  };
 </script>
 

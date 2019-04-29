@@ -1,19 +1,25 @@
 package scalest.admin
 
-import io.circe.{Decoder, Encoder, Json}
-import io.circe.syntax._
 import io.circe.generic.semiauto._
+import io.circe.syntax._
+import io.circe.{Encoder, Json}
 import scalest.admin.Utils._
 
 import scala.language.experimental.macros
 import scala.reflect.runtime.universe.TypeTag
 
+case class Component(id: String, body: String)
+
+object Component {
+  implicit val encoder: Encoder[Component] = deriveEncoder[Component]
+}
+
 case class FieldTypeSchema[T](inputType: Option[String] = None,
                               outputType: Option[String] = None,
                               default: Option[Json] = None,
                               addition: Option[Json] = None,
-                              inputView: Option[String] = None,
-                              outputView: Option[String] = None)
+                              inputComponent: Option[Component] = None,
+                              outputComponent: Option[Component] = None)
 
 object FieldTypeSchema {
   implicit def encoder[T]: Encoder[FieldTypeSchema[T]] = Encoder.instance { fts =>
@@ -22,10 +28,10 @@ object FieldTypeSchema {
       Seq(
         inputType.map("inputType" -> _.asJson).toList,
         outputType.map("outputType" -> _.asJson).toList,
-        default.map("default" -> _.asJson).toList,
-        addition.map("addition" -> _.asJson).toList,
-        inputView.map("inputView" -> _.asJson).toList,
-        outputView.map("outputView" -> _.asJson).toList
+        default.map("default" -> _).toList,
+        addition.map("addition" -> _).toList,
+        inputComponent.map("inputComponent" -> _.asJson).toList,
+        outputComponent.map("outputComponent" -> _.asJson).toList
         ).flatten
       )
   }

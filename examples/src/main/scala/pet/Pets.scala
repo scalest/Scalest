@@ -1,7 +1,7 @@
 package pet
 
-import pet.PetModel.Sexes.Sex
-import pet.PetModel.{Sexes, _}
+import pet.PetModel.Genders.Gender
+import pet.PetModel.{Genders, _}
 import scalest.admin.admin.H2ProfileProvider
 import scalest.admin.slick._
 import slick.ast.BaseTypedType
@@ -27,19 +27,25 @@ object Pets extends SlickModel with H2ProfileProvider {
 
     val name = column[String]("name")
 
+    val location = column[Location]("location")
+
     val bodySize = column[Byte]("body_size")
 
     val tags = column[Seq[String]]("tags")
 
     val adopted = column[Boolean]("adopted")
 
-    val sex = column[Sex]("sex")
+    val gender = column[Gender]("gender")
 
-    override def * = (id.?, name, adopted, tags, bodySize, sex).mapTo[Pet]
+    override def * = (id.?, name, adopted, tags, location, bodySize, gender).mapTo[Pet]
   }
 
-  implicit val sexEnumMapper: JdbcType[Sex] with BaseTypedType[Sex] = {
-    MappedColumnType.base[Sex, String](_.toString, Sexes.withName)
+  implicit val sexEnumMapper: JdbcType[Gender] with BaseTypedType[Gender] = {
+    MappedColumnType.base[Gender, String](_.toString, Genders.withName)
+  }
+
+  implicit val locationMapper: JdbcType[Location] with BaseTypedType[Location] = {
+    MappedColumnType.base[Location, String](_.asJson.noSpaces, parse(_).right.get.as[Location].right.get)
   }
 
   implicit val seqStringMapper: JdbcType[Seq[String]] with BaseTypedType[Seq[String]] = {

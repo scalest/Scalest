@@ -1,34 +1,25 @@
 package pet
 
 import akka.actor.ActorSystem
-import distage._
-import scalest.ScalestApp
+import akka.http.scaladsl.server.HttpApp
 import scalest.admin.slick.SlickModelAdmin
 import scalest.admin.AdminExtension
 import slick.basic.DatabaseConfig
 import slick.jdbc.H2Profile
 
-object PetModule
-  extends ModuleDef {
-  make[DatabaseConfig[H2Profile]].from { system: ActorSystem =>
-    DatabaseConfig.forConfig[H2Profile]("slick", system.settings.config)
-  }
-  make[Migrator]
-}
+object PetApp extends HttpApp with App {
 
-object PetApp extends ScalestApp("PetApp", List(PetModule)) with App {
+  val system = ActorSystem("PetAppSystem")
 
   import system.dispatcher
 
-  implicit val dbConfig: DatabaseConfig[H2Profile] = locator.get[DatabaseConfig[H2Profile]]
+  implicit val dbConfig: DatabaseConfig[H2Profile] = DatabaseConfig.forConfig[H2Profile]("slick", system.settings.config)
 
-  val migrator: Migrator = locator.get[Migrator]
-
-  migrator.migrate()
+  Migration.migrate
 
   override val routes = AdminExtension(SlickModelAdmin(Pets), SlickModelAdmin(Users)).route
 
-  startServer()
+  startServer("0.0.0.0", 9000, system)
 }
 
 /* You could also create ModelView manually like this:

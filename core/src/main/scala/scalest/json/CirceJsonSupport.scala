@@ -9,22 +9,21 @@ import io.circe.{Decoder, Encoder, HCursor, Json}
 import shapeless.Lazy
 
 
-case class `E&D`[T](encoder: Encoder[T],
-                    decoder: Decoder[T])
-  extends Encoder[T]
-  with Decoder[T] {
+case class JsonConverter[T](encoder: Encoder[T], decoder: Decoder[T]) extends Encoder[T] with Decoder[T] {
+
   override def apply(a: T): Json = encoder.apply(a)
 
   override def apply(c: HCursor): Result[T] = decoder.apply(c)
+
 }
 
 trait CirceJsonSupport
   extends ErrorAccumulatingCirceSupport {
 
   def circeObject[T](implicit decode: Lazy[DerivedDecoder[T]],
-                     encode: Lazy[DerivedObjectEncoder[T]]): `E&D`[T] = `E&D`(deriveEncoder[T], deriveDecoder[T])
+                     encode: Lazy[DerivedObjectEncoder[T]]): JsonConverter[T] = JsonConverter(deriveEncoder[T], deriveDecoder[T])
 
-  def circeEnum[E <: Enumeration](enum: E): `E&D`[E#Value] = `E&D`(Encoder.enumEncoder(enum), Decoder.enumDecoder(enum))
+  def circeEnum[E <: Enumeration](enum: E): JsonConverter[E#Value] = JsonConverter(Encoder.enumEncoder(enum), Decoder.enumDecoder(enum))
 
 }
 

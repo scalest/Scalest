@@ -6,11 +6,11 @@ import VueLocalStorage from 'vue-localstorage'
 import App from './App.vue'
 import router from './router'
 import 'vuetify/dist/vuetify.min.css'
-
+import SchemaStorage from './components/schema/schema_storage';
 
 Vue.config.productionTip = false;
 
-Axios.defaults.withCredentials = true
+Axios.defaults.withCredentials = true;
 
 Vue.prototype.$http = Axios;
 
@@ -26,7 +26,7 @@ req.keys().map(key => {
   return Vue.component(component.name, component);
 });
 
-const authToken = Vue.cookie.get('SCALEST_ADMIN')
+const authToken = Vue.cookie.get('SCALEST_ADMIN');
 
 if (authToken) {
   Axios.defaults.headers.common['Authorization'] = `Basic ${authToken}`;

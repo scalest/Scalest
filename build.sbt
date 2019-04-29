@@ -46,11 +46,9 @@ lazy val core = sonatypeProject("scalest-core", file("./core"))
     version := v
     libraryDependencies ++= Seq(
       "io.circe" %% "circe-core" % circeVersion,
-      "com.typesafe.akka" %% "akka-actor" % akkaVersion,
+      "io.circe" %% "circe-generic" % circeVersion,
       "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
-      "de.heikoseeberger" %% "akka-http-circe" % "1.25.2",
-      "com.github.pshirshov.izumi.r2" %% "distage-core" % izumiVersion,
-      "com.github.pshirshov.izumi.r2" %% "distage-config" % izumiVersion
+      "de.heikoseeberger" %% "akka-http-circe" % "1.25.2"
       )
   }
 

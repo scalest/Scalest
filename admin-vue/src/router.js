@@ -4,18 +4,18 @@ import Home from './views/Home.vue'
 import Login from './views/Login.vue'
 import Model from './components/Model.vue'
 
-Vue.use(Router)
+Vue.use(Router);
 
 const router = new Router({
   routes: [
-    { path: '/', component: Home, meta: { auth: true } },
+    {path: '/', component: Home, meta: {auth: true}},
     {
       path: '/model/:name', component: Model, props: (route) => ({
         name: route.params.name
       }),
-      meta: { auth: true }
+      meta: {auth: true}
     },
-    { path: '/login', component: Login }
+    {path: '/login', component: Login}
   ]
 });
 
@@ -24,7 +24,7 @@ router.beforeEach((to, from, next) => {
     if (Vue.cookie.get('SCALEST_ADMIN') == null) {
       next({
         path: '/login',
-        params: { nextUrl: to.fullPath }
+        params: {nextUrl: to.fullPath}
       })
     } else {
       next()
@@ -32,6 +32,6 @@ router.beforeEach((to, from, next) => {
   } else {
     next()
   }
-})
+});
 
 export default router

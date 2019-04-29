@@ -1,11 +1,11 @@
 <template>
-  <span>{{item[field.name]}}</span>
+    <span>{{item[field.name]}}</span>
 </template>
 
 <script>
-export default {
-  name: "string-output",
-  props: { field: Object, item: Object }
-};
+  export default {
+    name: "string-output",
+    props: {field: Object, item: Object}
+  };
 </script>
 
