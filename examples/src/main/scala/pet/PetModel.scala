@@ -23,26 +23,28 @@ object PetModel extends CirceJsonSupport {
 
     val inputComponent = Component(
       "location-input",
-      """
-        | const c = {
-        |   name: 'location-input',
-        |   props: {field: Object, item: Object},
-        |   template: '<v-text-field v-model="item[field.name]" box :label="field.name"></v-text-field>'
-        | };
-        | c;
-      """.stripMargin
+      """{
+           name: 'location-input',
+           props: {field: Object, item: Object},
+           template: `
+           <div>
+            <int-input :item="item[field.name]" :field="{name:'latitude'}"></int-input>
+            <int-input :item="item[field.name]" :field="{name:'longitude'}"></int-input>
+           </div>`
+         }"""
       )
 
     val outputComponent = Component(
       "location-output",
-      """
-        | const c = {
-        |   name: "location-output",
-        |   props: {field: Object, item: Object},
-        |   template: '<span>{{item[field.name]}}</span>'
-        | };
-        | c;
-      """.stripMargin
+      """{
+           name: "location-output",
+           props: {field: Object, item: Object},
+           template: `
+            <div>
+             <int-output :item="item[field.name]" :field="{name:'latitude'}"></int-output>
+             <int-output :item="item[field.name]" :field="{name:'longitude'}"></int-output>
+            </div>`
+         }"""
       )
 
     implicit val locationFTS: FieldTypeSchema[Location] = FieldTypeSchema(

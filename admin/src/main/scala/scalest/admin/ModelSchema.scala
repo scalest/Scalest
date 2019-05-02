@@ -21,7 +21,17 @@ object FieldView {
 
 case class ModelSchema[T](name: String, fields: Seq[FieldView])
 
+case class FieldConfiguration[T](readable: Boolean = true,
+                                 writable: Boolean = true,
+                                 addition: Option[Json] = None,
+                                 default: Option[Json] = None,
+                                 schema: Option[FieldTypeSchema[T]] = None)
+
 object ModelSchema extends FieldTypeSchemaInstances {
+
+  def apply[T](conf: (String => _, FieldConfiguration[_])*)(implicit ms: ModelSchema[T]): ModelSchema[T] = {
+    ms
+  }
 
   type Typeclass[T] = FieldTypeSchema[T]
 

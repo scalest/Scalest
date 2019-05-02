@@ -7,18 +7,19 @@ const SchemaStorage = {
   async all() {
     if (this.schemas === null) {
       try {
-        const res = await Axios.get(`${process.env.VUE_APP_BACKEND_SERVICE_URL}/admin/schemas`)
-        this.schemas = res.data.map(s => new ModelSchema(s));
-        const components = this.schemas.flatMap(s => s.components());
+        this.schemas = Axios.get(`${process.env.VUE_APP_BACKEND_SERVICE_URL}/admin/schemas`)
+          .then(res => res.data.map(s => new ModelSchema(s)));
+
+        const components = (await this.schemas).flatMap(s => s.components());
         components.forEach(c => {
           Vue.component(c.id, eval(c.body))
         });
       } catch (e) {
-        this.schemas = [];
+        this.schemas = Promise.resolve([]);
       }
     }
 
-    return this.schemas;
+    return await this.schemas;
   }
 };
 

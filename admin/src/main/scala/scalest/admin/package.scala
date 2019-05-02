@@ -1,6 +1,6 @@
 package scalest
 
-import io.circe.{Decoder, Encoder}
+import io.circe.{Decoder, Encoder, Json}
 import io.circe.generic.semiauto._
 
 package object admin extends FieldTypeSchemaInstances {
@@ -22,5 +22,11 @@ package object admin extends FieldTypeSchemaInstances {
   object AppError {
     implicit val encoder: Encoder[AppError] = deriveEncoder
   }
+
+  def conf[T](readable: Boolean = true,
+              writable: Boolean = true,
+              addition: Option[Json] = None,
+              default: Option[Json] = None,
+              schema: Option[FieldTypeSchema[T]] = None) = FieldConfiguration(readable, writable, addition, default, schema)
 
 }

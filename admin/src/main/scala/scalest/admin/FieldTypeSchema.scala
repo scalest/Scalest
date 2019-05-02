@@ -6,11 +6,14 @@ import io.circe.{Encoder, Json}
 import scalest.admin.Utils._
 
 import scala.language.experimental.macros
+import scala.language.implicitConversions
 import scala.reflect.runtime.universe.TypeTag
 
 case class Component(id: String, body: String)
 
 object Component {
+  def apply(id: String, body: String): Component = new Component(id, s"const body = $body;body;")
+
   implicit val encoder: Encoder[Component] = deriveEncoder[Component]
 }
 

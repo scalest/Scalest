@@ -41,8 +41,6 @@
 
 <script>
   import Axios from "axios";
-  import SchemaStorage from '../components/schema/schema_storage';
-
   export default {
     data: () => ({
       username: "",
@@ -60,7 +58,6 @@
           .then(r => {
             this.$cookie.set("SCALEST_ADMIN", r.data.token);
             Axios.defaults.headers.common["Authorization"] = `Basic ${r.data.token}`;
-            SchemaStorage.init();
             this.$router.push(this.$route.params.nextUrl || "/");
           })
           .catch(() => this.$emit("notification", "Can`t login"));
