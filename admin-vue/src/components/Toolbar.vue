@@ -27,7 +27,7 @@
 </template>
 
 <script>
-  import SchemaStorage from './schema/schema_storage';
+  import ModelInfoStorage from './schema/model_info_storage';
 
   export default {
     name: "scalest-header",
@@ -36,8 +36,7 @@
     },
     async mounted() {
       if (this.$cookie.get("SCALEST_ADMIN")) {
-        this.models = (await SchemaStorage.all()).map(s => s.name);
-        console.log(this.models)
+        this.models = (await ModelInfoStorage.all()).map(s => s.name);
       }
     }
   };

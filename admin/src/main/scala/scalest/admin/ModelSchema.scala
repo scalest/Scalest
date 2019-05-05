@@ -20,7 +20,7 @@ object FieldView {
 
 case class ModelSchema[T](name: String, fields: Seq[FieldView[_]])
 
-object ModelSchema extends FieldTypeSchemaInstances {
+object ModelSchema {
 
   def apply[T](conf: (String => _, FieldView[_])*)(implicit ms: ModelSchema[T]): ModelSchema[T] = {
     ms
@@ -35,6 +35,7 @@ object ModelSchema extends FieldTypeSchemaInstances {
   }
 
   implicit val encoder: Encoder[ModelSchema[_]] = Encoder.instance { ms =>
-    Json.obj("name" -> ms.name.asJson, "fields" -> ms.fields.asJson(encodeSeq(FieldView.encoder)))
+    import ms._
+    Json.obj("name" -> name.asJson, "fields" -> encodeSeq(FieldView.encoder)(fields))
   }
 }

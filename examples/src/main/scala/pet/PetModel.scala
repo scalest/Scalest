@@ -2,11 +2,11 @@ package pet
 
 import pet.PetModel.Genders.Gender
 import scalest.admin.{Component, FieldSchema}
-import scalest.json.{CirceJsonSupport, JsonConverter}
 import cats.syntax.option._
 import io.circe.syntax._
+import scalest.{CirceHelpers, JsonConverter}
 
-object PetModel extends CirceJsonSupport {
+object PetModel extends CirceHelpers {
 
   object Genders extends Enumeration {
     type Gender = Value

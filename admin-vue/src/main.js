@@ -6,7 +6,6 @@ import VueLocalStorage from 'vue-localstorage'
 import App from './App.vue'
 import router from './router'
 import 'vuetify/dist/vuetify.min.css'
-import SchemaStorage from './components/schema/schema_storage';
 
 Vue.config.productionTip = false;
 

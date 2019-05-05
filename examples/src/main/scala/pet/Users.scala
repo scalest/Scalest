@@ -1,19 +1,16 @@
 package pet
 
 import pet.PetModel.User
-import scalest.admin.admin.H2ProfileProvider
-import scalest.admin.slick.SlickModel
+import scalest.admin.slick.{H2ProfileProvider, SlickModel}
 
 
 object Users extends SlickModel with H2ProfileProvider {
-
   import jdbcProfile.api._
+  override val data = init
 
   type Id = Int
   type Model = User
   type ModelTable = UsersTable
-
-  override val idData = IdData(_.id, _.copy(_))
 
   val query = TableQuery[UsersTable]
 

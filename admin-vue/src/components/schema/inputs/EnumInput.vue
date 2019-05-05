@@ -3,7 +3,7 @@
             v-model="item[field.name]"
             :label="field.name"
             box
-            :items="field.schema.addition.values"></v-select>
+            :items="field.info.addition.values"></v-select>
 </template>
 
 <script>

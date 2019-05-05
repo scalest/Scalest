@@ -1,8 +1,9 @@
-class ModelSchema {
+class ModelInfo {
 
-  constructor(schema) {
-    this.name = schema.name;
-    this.fields = schema.fields;
+  constructor(info) {
+    this.name = info.schema.name;
+    this.fields = info.schema.fields;
+    this.actions = info.actions;
   }
 
   headers() {
@@ -40,5 +41,5 @@ class ModelSchema {
 }
 
 export {
-  ModelSchema
+  ModelInfo
 }

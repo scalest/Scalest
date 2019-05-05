@@ -2,7 +2,6 @@ package pet
 
 import pet.PetModel.Genders.Gender
 import pet.PetModel.{Genders, _}
-import scalest.admin.admin.H2ProfileProvider
 import scalest.admin.slick._
 import slick.ast.BaseTypedType
 import slick.jdbc.JdbcType
@@ -10,14 +9,12 @@ import io.circe.syntax._
 import io.circe.parser._
 
 object Pets extends SlickModel with H2ProfileProvider {
-
   import jdbcProfile.api._
+  override val data = init
 
   type Id = Int
   type Model = Pet
   type ModelTable = PetsTable
-
-  override val idData = IdData(_.id, _.copy(_))
 
   val query = TableQuery[PetsTable]
 
@@ -39,6 +36,8 @@ object Pets extends SlickModel with H2ProfileProvider {
 
     override def * = (id.?, name, adopted, tags, location, bodySize, gender).mapTo[Pet]
   }
+
+  def updateAll(pets: Seq[Pet]): DBIOAction[Seq[Int], NoStream, Effect.Write] = DBIO.sequence(pets.map(query.insertOrUpdate))
 
   implicit val sexEnumMapper: JdbcType[Gender] with BaseTypedType[Gender] = {
     MappedColumnType.base[Gender, String](_.toString, Genders.withName)

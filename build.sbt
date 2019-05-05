@@ -40,28 +40,24 @@ def sonatypeProject(id: String, base: File) =
         </developers>
       )
 
-lazy val core = sonatypeProject("scalest-core", file("./core"))
+lazy val admin = sonatypeProject("scalest-admin", file("./admin"))
   .settings {
     version := v
     libraryDependencies ++= Seq(
       "io.circe" %% "circe-core" % circeVersion,
-      "io.circe" %% "circe-generic" % circeVersion,
+      "io.circe" %% "circe-generic" % "0.11.1",
       "io.circe" %% "circe-parser" % circeVersion,
-      "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
-      "de.heikoseeberger" %% "akka-http-circe" % "1.25.2"
+      "com.propensive" %% "magnolia" % "0.10.0"
       )
   }
 
-lazy val admin = sonatypeProject("scalest-admin", file("./admin"))
+lazy val adminAkka = sonatypeProject("scalest-akka", file("./admin-akka"))
+  .dependsOn(admin)
   .settings {
     version := v
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
       "de.heikoseeberger" %% "akka-http-circe" % "1.25.2",
-      "io.circe" %% "circe-core" % circeVersion,
-      "io.circe" %% "circe-generic" % "0.11.1",
-      "io.circe" %% "circe-parser" % circeVersion,
-      "com.propensive" %% "magnolia" % "0.10.0"
       )
   }
 
@@ -76,10 +72,7 @@ lazy val adminSlick = sonatypeProject("scalest-admin-slick", file("./admin-slick
   }
 
 lazy val examples = Project("scalest-examples", file("./examples"))
-  .dependsOn(
-    adminSlick,
-    core
-    )
+  .dependsOn(adminAkka, adminSlick)
   .settings {
     skip in publish := true
     publish := {}
@@ -91,12 +84,7 @@ lazy val examples = Project("scalest-examples", file("./examples"))
   }
 
 lazy val root = Project(id = "scalest", base = file("."))
-  .aggregate(
-    core,
-    admin,
-    adminSlick,
-    examples
-    )
+  .aggregate(admin, adminAkka, adminSlick, examples)
   .settings {
     name := "scalest"
     version := v

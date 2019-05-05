@@ -2,7 +2,7 @@
     <v-card>
         <toolbar/>
         <v-toolbar color="white" flat="flat">
-            <v-toolbar-title>{{schema.name}}</v-toolbar-title>
+            <v-toolbar-title>{{info.name}}</v-toolbar-title>
             <v-divider class="mx-2" inset="inset" vertical="vertical"></v-divider>
             <v-spacer></v-spacer>
             <v-dialog v-model="dialog" style="max-width: 500px;">
@@ -15,7 +15,7 @@
                         <v-container grid-list-md="grid-list-md">
                             <v-layout wrap="wrap">
                                 <v-flex xs12="xs12">
-                                    <template v-for="field in schema.fields">
+                                    <template v-for="field in info.fields">
                                         <component
                                                 v-if="field.schema.inputType || field.schema.inputComponent"
                                                 :key="field.name"
@@ -38,7 +38,7 @@
         </v-toolbar>
         <v-data-table v-bind:headers="headers" v-bind:items="models" class="elevation-1">
             <template slot="items" slot-scope="props">
-                <template v-for="field in schema.fields">
+                <template v-for="field in info.fields">
                     <td :key="field.name">
                         <component
                                 v-if="field.schema.outputType || field.schema.outputComponent"
@@ -60,7 +60,7 @@
 
 <script>
   import Toolbar from "./Toolbar.vue";
-  import SchemaStorage from './schema/schema_storage';
+  import ModelInfoStorage from './schema/model_info_storage';
 
   export default {
     props: {name: String},
@@ -74,7 +74,7 @@
         headers: [],
         models: [],
         editedIndex: -1,
-        schema: {},
+        info: {},
         editedItem: {}
       };
     },
@@ -106,9 +106,9 @@
           .get(`${process.env.VUE_APP_BACKEND_SERVICE_URL}/api/${this.name}`)
           .then(r => (this.models = r.data));
 
-        this.schema = (await SchemaStorage.all()).find(s => s.name === this.name);
-        this.editedItem = this.schema.defaultItem();
-        this.headers = this.schema.headers();
+        this.info = (await ModelInfoStorage.all()).find(s => s.name === this.name);
+        this.editedItem = this.info.defaultItem();
+        this.headers = this.info.headers();
       },
       editItem(item) {
         this.editedIndex = this.models.indexOf(item);
@@ -136,7 +136,7 @@
       close() {
         this.dialog = false;
         setTimeout(() => {
-          this.editedItem = Object.assign({}, this.schema.defaultItem());
+          this.editedItem = Object.assign({}, this.info.defaultItem());
           this.editedIndex = -1;
         }, 300);
       },
