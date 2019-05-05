@@ -37,6 +37,7 @@
     async mounted() {
       if (this.$cookie.get("SCALEST_ADMIN")) {
         this.models = (await SchemaStorage.all()).map(s => s.name);
+        console.log(this.models)
       }
     }
   };

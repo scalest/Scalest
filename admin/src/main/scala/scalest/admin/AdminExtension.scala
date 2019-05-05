@@ -2,6 +2,8 @@ package scalest.admin
 
 import akka.http.scaladsl.server.Route
 import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport
+import io.circe.Encoder
+import io.circe.generic.semiauto.deriveEncoder
 
 class AdminExtension(modelAdmins: Seq[ModelAdmin[_, _]]) extends AuthDirectives with CorsDirectives with ErrorAccumulatingCirceSupport {
 
@@ -21,32 +23,38 @@ class AdminExtension(modelAdmins: Seq[ModelAdmin[_, _]]) extends AuthDirectives 
     }
   }
 
-  private def schemasRoute =
+  private def schemasRoute = {
     auth {
       pathPrefix("schemas") {
         pathEndOrSingleSlash {
           complete(modelAdminSchemas)
-        } ~ pathPrefix(Segment) { name =>
-          complete {
-            modelAdminSchemas.find(_.name == name).toRight(AppError("error.not-found"))
-          }
         }
       }
     }
+  }
 
-  def apiRoute: Route =
+  def apiRoute: Route = {
     auth {
       pathPrefix("api") {
         modelAdmins.map(_.route).reduce(_ ~ _)
       }
     }
+  }
 
-  def staticRoute: Route = pathPrefix("static") {
-    getFromResourceDirectory("static") ~ getFromResourceDirectory("vue/static")
-  } ~ pathPrefix("favicon.ico")(getFromResource("vue/favicon.ico"))
-
+  def staticRoute: Route = {
+    pathPrefix("static")(getFromResourceDirectory("vue/static")) ~
+      pathPrefix("favicon.ico")(getFromResource("vue/favicon.ico")) ~
+      pathPrefix("scalest.png")(getFromResource("vue/scalest.png"))
+  }
 }
 
 object AdminExtension {
   def apply(modelAdmins: ModelAdmin[_, _]*): AdminExtension = new AdminExtension(modelAdmins)
+
+  case class AppError(error: String)
+
+  object AppError {
+    implicit val encoder: Encoder[AppError] = deriveEncoder
+  }
+
 }

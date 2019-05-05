@@ -7,7 +7,7 @@
                     <v-container class="fill-heigth">
                         <v-layout class="align-center justify-center">
                             <img
-                                    :src="`${publicPath}/static/images/scalest.png`"
+                                    :src="`${publicPath}/scalest.png`"
                                     alt="scalest-logo"
                                     style="max-width:100%;max-height:100%;"
                             >

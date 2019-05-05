@@ -1,7 +1,7 @@
 package pet
 
 import pet.PetModel.Genders.Gender
-import scalest.admin.{Component, FieldTypeSchema}
+import scalest.admin.{Component, FieldSchema}
 import scalest.json.{CirceJsonSupport, JsonConverter}
 import cats.syntax.option._
 import io.circe.syntax._
@@ -47,7 +47,7 @@ object PetModel extends CirceJsonSupport {
          }"""
       )
 
-    implicit val locationFTS: FieldTypeSchema[Location] = FieldTypeSchema(
+    implicit val locationFTS: FieldSchema[Location] = FieldSchema(
       inputComponent = inputComponent.some,
       outputComponent = outputComponent.some,
       default = Location(0, 0).asJson.some)

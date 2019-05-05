@@ -15,10 +15,10 @@ const SchemaStorage = {
           Vue.component(c.id, eval(c.body))
         });
       } catch (e) {
+        console.log(e);
         this.schemas = Promise.resolve([]);
       }
     }
-
     return await this.schemas;
   }
 };

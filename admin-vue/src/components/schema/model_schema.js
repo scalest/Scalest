@@ -32,8 +32,8 @@ class ModelSchema {
   components() {
     return this.fields.flatMap(f => {
       const components = [];
-      if (f.schema.outputComponent !== undefined) components.push(f.schema.outputComponent);
-      if (f.schema.inputComponent !== undefined) components.push(f.schema.inputComponent);
+      if (f.schema.outputComponent) components.push(f.schema.outputComponent);
+      if (f.schema.inputComponent) components.push(f.schema.inputComponent);
       return components;
     });
   }

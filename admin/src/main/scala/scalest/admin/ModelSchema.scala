@@ -1,45 +1,40 @@
 package scalest.admin
 
-import io.circe.{Encoder, Json}
+import io.circe.Encoder.encodeSeq
+import io.circe._
 import io.circe.syntax._
-import magnolia.{CaseClass, Magnolia, SealedTrait, debug}
+import magnolia.{CaseClass, Magnolia, debug}
 
 import scala.language.experimental.macros
 
-case class FieldView(name: String, schema: FieldTypeSchema[_])
+case class FieldView[T](name: String,
+                        schema: FieldSchema[T],
+                        readable: Boolean = true,
+                        writable: Boolean = true)
 
 object FieldView {
-  implicit val encoder: Encoder[FieldView] = Encoder.instance { fw =>
-    Json.fromFields(
-      Seq(
-        "name" -> fw.name.asJson,
-        "schema" -> fw.schema.asJson
-        )
-      )
+  implicit val encoder: Encoder[FieldView[_]] = Encoder.instance { fw =>
+    Json.obj("name" -> fw.name.asJson, "readable" -> fw.readable.asJson, "writable" -> fw.writable.asJson, "schema" -> fw.schema.asJson)
   }
 }
 
-case class ModelSchema[T](name: String, fields: Seq[FieldView])
-
-case class FieldConfiguration[T](readable: Boolean = true,
-                                 writable: Boolean = true,
-                                 addition: Option[Json] = None,
-                                 default: Option[Json] = None,
-                                 schema: Option[FieldTypeSchema[T]] = None)
+case class ModelSchema[T](name: String, fields: Seq[FieldView[_]])
 
 object ModelSchema extends FieldTypeSchemaInstances {
 
-  def apply[T](conf: (String => _, FieldConfiguration[_])*)(implicit ms: ModelSchema[T]): ModelSchema[T] = {
+  def apply[T](conf: (String => _, FieldView[_])*)(implicit ms: ModelSchema[T]): ModelSchema[T] = {
     ms
   }
 
-  type Typeclass[T] = FieldTypeSchema[T]
+  type Typeclass[T] = FieldSchema[T]
 
   @debug implicit def gen[T]: ModelSchema[T] = macro Magnolia.gen[T]
 
-  def combine[T](ctx: CaseClass[FieldTypeSchema, T]): ModelSchema[T] = {
+  def combine[T](ctx: CaseClass[FieldSchema, T]): ModelSchema[T] = {
     ModelSchema(Utils.snakify(ctx.typeName.short), ctx.parameters.map(p => FieldView(name = p.label, schema = p.typeclass)))
   }
 
-  implicit val encoder: Encoder[ModelSchema[_]] = Encoder.instance(ms => Json.fromFields(Seq("name" -> ms.name.asJson, "fields" -> ms.fields.asJson)))
+  implicit val encoder: Encoder[ModelSchema[_]] = Encoder.instance { ms =>
+    Json.obj("name" -> ms.name.asJson, "fields" -> ms.fields.asJson(encodeSeq(FieldView.encoder)))
+  }
 }

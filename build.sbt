@@ -1,13 +1,12 @@
 val circeVersion = "0.10.0"
 val akkaVersion = "2.5.20"
-val izumiVersion = "0.6.29"
 val slickVersion = "3.3.0"
 val akkaHttpVersion = "10.1.7"
 val scala2_12Version = "2.12.8"
 
 lazy val snapshot: Boolean = true
 lazy val v: String = {
-  val vv = "0.0.2"
+  val vv = "0.0.3"
   if (!snapshot) vv
   else vv + "-SNAPSHOT"
 }
@@ -47,6 +46,7 @@ lazy val core = sonatypeProject("scalest-core", file("./core"))
     libraryDependencies ++= Seq(
       "io.circe" %% "circe-core" % circeVersion,
       "io.circe" %% "circe-generic" % circeVersion,
+      "io.circe" %% "circe-parser" % circeVersion,
       "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
       "de.heikoseeberger" %% "akka-http-circe" % "1.25.2"
       )
@@ -58,8 +58,9 @@ lazy val admin = sonatypeProject("scalest-admin", file("./admin"))
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
       "de.heikoseeberger" %% "akka-http-circe" % "1.25.2",
+      "io.circe" %% "circe-core" % circeVersion,
       "io.circe" %% "circe-generic" % "0.11.1",
-      "com.lihaoyi" %% "scalatags" % "0.6.7",
+      "io.circe" %% "circe-parser" % circeVersion,
       "com.propensive" %% "magnolia" % "0.10.0"
       )
   }
